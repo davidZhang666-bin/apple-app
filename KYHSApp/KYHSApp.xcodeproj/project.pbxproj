@@ -1,0 +1,409 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10001 /* KYHSAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20001; };
+		A10002 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20002; };
+		A10003 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20003; };
+		A10004 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20004; };
+		A10005 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20005; };
+		A10006 /* PushNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20006; };
+		A10007 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20007; };
+		A10008 /* ServiceAgreementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20008; };
+		A10009 /* PrivacyPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20009; };
+		A10010 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20010; };
+		A10011 /* LiveCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20011; };
+		A10012 /* LivingWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20012; };
+		A10013 /* VideoQuizListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20013; };
+		A10014 /* VideoQuizAnswerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20014; };
+		A10015 /* VideoQuizSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20015; };
+		A10016 /* UserCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20016; };
+		A10017 /* MyProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20017; };
+		A10018 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20018; };
+		A10019 /* QRCodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20019; };
+		A10020 /* CommonWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20020; };
+		A10021 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20021; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A30001 /* KYHSApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KYHSApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20001 /* KYHSAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KYHSAppApp.swift; sourceTree = "<group>"; };
+		A20002 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		A20003 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
+		A20004 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
+		A20005 /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
+		A20006 /* PushNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationManager.swift; sourceTree = "<group>"; };
+		A20007 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		A20008 /* ServiceAgreementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceAgreementView.swift; sourceTree = "<group>"; };
+		A20009 /* PrivacyPolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyView.swift; sourceTree = "<group>"; };
+		A20010 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		A20011 /* LiveCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveCenterView.swift; sourceTree = "<group>"; };
+		A20012 /* LivingWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LivingWebView.swift; sourceTree = "<group>"; };
+		A20013 /* VideoQuizListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoQuizListView.swift; sourceTree = "<group>"; };
+		A20014 /* VideoQuizAnswerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoQuizAnswerView.swift; sourceTree = "<group>"; };
+		A20015 /* VideoQuizSuccessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoQuizSuccessView.swift; sourceTree = "<group>"; };
+		A20016 /* UserCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCenterView.swift; sourceTree = "<group>"; };
+		A20017 /* MyProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyProfileView.swift; sourceTree = "<group>"; };
+		A20018 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A20019 /* QRCodeScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeScannerView.swift; sourceTree = "<group>"; };
+		A20020 /* CommonWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonWebView.swift; sourceTree = "<group>"; };
+		A20021 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A40001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A50001 = {
+			isa = PBXGroup;
+			children = (
+				A50002 /* KYHSApp */,
+				A50003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A50002 /* KYHSApp */ = {
+			isa = PBXGroup;
+			children = (
+				A20001 /* KYHSAppApp.swift */,
+				A50004 /* Models */,
+				A50005 /* Services */,
+				A50006 /* Views */,
+				A20021 /* Assets.xcassets */,
+			);
+			path = KYHSApp;
+			sourceTree = "<group>";
+		};
+		A50003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A30001 /* KYHSApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A50004 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A20002 /* Models.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A50005 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A20003 /* NetworkService.swift */,
+				A20004 /* KeychainManager.swift */,
+				A20005 /* AuthManager.swift */,
+				A20006 /* PushNotificationManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		A50006 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A50007 /* Login */,
+				A50008 /* LiveCenter */,
+				A50009 /* VideoQuiz */,
+				A50010 /* User */,
+				A50011 /* Common */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A50007 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				A20007 /* LoginView.swift */,
+				A20008 /* ServiceAgreementView.swift */,
+				A20009 /* PrivacyPolicyView.swift */,
+			);
+			path = Login;
+			sourceTree = "<group>";
+		};
+		A50008 /* LiveCenter */ = {
+			isa = PBXGroup;
+			children = (
+				A20011 /* LiveCenterView.swift */,
+				A20012 /* LivingWebView.swift */,
+			);
+			path = LiveCenter;
+			sourceTree = "<group>";
+		};
+		A50009 /* VideoQuiz */ = {
+			isa = PBXGroup;
+			children = (
+				A20013 /* VideoQuizListView.swift */,
+				A20014 /* VideoQuizAnswerView.swift */,
+				A20015 /* VideoQuizSuccessView.swift */,
+			);
+			path = VideoQuiz;
+			sourceTree = "<group>";
+		};
+		A50010 /* User */ = {
+			isa = PBXGroup;
+			children = (
+				A20016 /* UserCenterView.swift */,
+				A20017 /* MyProfileView.swift */,
+				A20018 /* SettingsView.swift */,
+			);
+			path = User;
+			sourceTree = "<group>";
+		};
+		A50011 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				A20010 /* MainTabView.swift */,
+				A20019 /* QRCodeScannerView.swift */,
+				A20020 /* CommonWebView.swift */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A60001 /* KYHSApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A70003 /* Build configuration list for PBXNativeTarget "KYHSApp" */;
+			buildPhases = (
+				A40002 /* Sources */,
+				A40001 /* Frameworks */,
+				A40003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = KYHSApp;
+			productName = KYHSApp;
+			productReference = A30001 /* KYHSApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A80001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					A60001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = A70001 /* Build configuration list for PBXProject "KYHSApp" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = "zh-Hans";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				"zh-Hans",
+			);
+			mainGroup = A50001;
+			productRefGroup = A50003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A60001 /* KYHSApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A40003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10021 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A40002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10001 /* KYHSAppApp.swift in Sources */,
+				A10002 /* Models.swift in Sources */,
+				A10003 /* NetworkService.swift in Sources */,
+				A10004 /* KeychainManager.swift in Sources */,
+				A10005 /* AuthManager.swift in Sources */,
+				A10006 /* PushNotificationManager.swift in Sources */,
+				A10007 /* LoginView.swift in Sources */,
+				A10008 /* ServiceAgreementView.swift in Sources */,
+				A10009 /* PrivacyPolicyView.swift in Sources */,
+				A10010 /* MainTabView.swift in Sources */,
+				A10011 /* LiveCenterView.swift in Sources */,
+				A10012 /* LivingWebView.swift in Sources */,
+				A10013 /* VideoQuizListView.swift in Sources */,
+				A10014 /* VideoQuizAnswerView.swift in Sources */,
+				A10015 /* VideoQuizSuccessView.swift in Sources */,
+				A10016 /* UserCenterView.swift in Sources */,
+				A10017 /* MyProfileView.swift in Sources */,
+				A10018 /* SettingsView.swift in Sources */,
+				A10019 /* QRCodeScannerView.swift in Sources */,
+				A10020 /* CommonWebView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A90001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A90002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A90003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KYHSApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "康源华善";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cn.kangyuanhuashan.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A90004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KYHSApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "康源华善";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cn.kangyuanhuashan.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A70001 /* Build configuration list for PBXProject "KYHSApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A90001 /* Debug */,
+				A90002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A70003 /* Build configuration list for PBXNativeTarget "KYHSApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A90003 /* Debug */,
+				A90004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = A80001 /* Project object */;
+}
