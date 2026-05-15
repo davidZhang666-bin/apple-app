@@ -55,6 +55,10 @@ final class NetworkService {
         }
 
         print("🌐 \(method) \(url.absoluteString)")
+        if let body = body, let bodyData = try? JSONEncoder().encode(body),
+           let bodyStr = String(data: bodyData, encoding: .utf8) {
+            print("📤 请求参数: \(bodyStr)")
+        }
         let (data, response) = try await URLSession.shared.data(for: request)
         if let httpResp = response as? HTTPURLResponse {
             print("📡 \(httpResp.statusCode) \(url.lastPathComponent)")
@@ -73,26 +77,34 @@ final class NetworkService {
             throw NetworkError.unauthorized
         }
 
-        if code == 500 {
-            throw NetworkError.serverError(rawJSON["msg"] as? String ?? "服务器错误")
+        if code != 200 {
+            throw NetworkError.serverError(rawJSON["msg"] as? String ?? "请求失败")
         }
 
         // 对齐 demo: code == 200 时只解码 data 字段
         if code == 200 {
             if let dataField = rawJSON["data"] {
                 let dataJSON = try JSONSerialization.data(withJSONObject: dataField)
-                if let decoded = try? JSONDecoder().decode(T.self, from: dataJSON) {
-                    return decoded
+                do {
+                    return try JSONDecoder().decode(T.self, from: dataJSON)
+                } catch {
+                    print("❌ 解码data字段失败: \(error)")
+                    print("📄 data内容: \(String(data: dataJSON, encoding: .utf8) ?? "")")
+                    throw NetworkError.decodingError
                 }
             }
+            print("❌ code=200但无data字段")
             throw NetworkError.decodingError
         }
 
         // 非 200 的其他 code，返回完整响应（兼容 appLogin 401 等场景）
-        if let decoded = try? JSONDecoder().decode(T.self, from: data) {
-            return decoded
+        do {
+            return try JSONDecoder().decode(T.self, from: data)
+        } catch {
+            print("❌ 解码完整响应失败: \(error)")
+            print("📄 code=\(code), 响应: \(String(data: data, encoding: .utf8) ?? "")")
+            throw NetworkError.decodingError
         }
-        throw NetworkError.decodingError
     }
 
     func get<T: Codable>(_ path: String, params: [String: String]? = nil) async throws -> T {

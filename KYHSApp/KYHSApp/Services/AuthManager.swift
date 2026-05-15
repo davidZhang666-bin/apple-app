@@ -17,9 +17,9 @@ final class AuthManager: ObservableObject {
         }
     }
 
-    func login(token: String, userId: Int) {
+    func login(token: String, userId: String) {
         KeychainManager.shared.saveToken(token)
-        KeychainManager.shared.saveUserId(String(userId))
+        KeychainManager.shared.saveUserId(userId)
         isAuthenticated = true
     }
 

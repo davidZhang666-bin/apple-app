@@ -7,9 +7,15 @@ struct VideoQuizListView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Image("home-bg")
-                    .resizable()
-                    .ignoresSafeArea()
+                if UIImage(named: "home-bg") != nil {
+                    Image("home-bg")
+                        .resizable()
+                        .ignoresSafeArea()
+                } else {
+                    LinearGradient(colors: [Color(hex: "0A9200"), Color(hex: "065A00")],
+                                   startPoint: .top, endPoint: .bottom)
+                        .ignoresSafeArea()
+                }
 
                 VStack(spacing: 0) {
                     if quizList.isEmpty && !isLoading {

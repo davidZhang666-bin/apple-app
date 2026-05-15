@@ -22,11 +22,17 @@ struct LoginView: View {
                 Spacer().frame(height: 80)
 
                 // Logo
-                Image("login-logo")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 275, height: 76)
-                    .padding(.leading, 25)
+                if UIImage(named: "login-logo") != nil {
+                    Image("login-logo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 275, height: 76)
+                        .padding(.leading, 25)
+                } else {
+                    Text("康源华善")
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(Color(hex: "0A9200"))
+                }
 
                 Spacer().frame(height: 34)
 

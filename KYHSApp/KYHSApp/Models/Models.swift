@@ -16,7 +16,7 @@ struct UserInfo: Codable {
 
 struct LoginResponse: Codable {
     let token: String?
-    let userId: Int?
+    let userId: String?
 }
 
 // MARK: - Live Stream
@@ -40,7 +40,7 @@ struct LiveStreamInfo: Codable {
 }
 
 struct ReservedLiveItem: Codable {
-    let liveId: Int?
+    let liveId: String?
 }
 
 struct ReservedLiveListResponse: Codable {

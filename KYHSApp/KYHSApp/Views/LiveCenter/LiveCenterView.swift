@@ -13,7 +13,7 @@ struct LiveCenterView: View {
     private var isLiving: Bool { livingInfo != nil }
     private var trailerList: [LiveItem] { liveItems.filter { $0.live_status.status == 4 } }
     private var endList: [LiveItem] { liveItems.filter { $0.live_status.status == 3 } }
-    private var bookedLiveIds: Set<Int> {
+    private var bookedLiveIds: Set<String> {
         Set(reservedList.compactMap { $0.liveId })
     }
 
@@ -21,17 +21,30 @@ struct LiveCenterView: View {
         NavigationStack {
             ZStack {
                 // Background
-                Image("home-bg")
-                    .resizable()
-                    .ignoresSafeArea()
+                if UIImage(named: "home-bg") != nil {
+                    Image("home-bg")
+                        .resizable()
+                        .ignoresSafeArea()
+                } else {
+                    LinearGradient(colors: [Color(hex: "0A9200"), Color(hex: "065A00")],
+                                   startPoint: .top, endPoint: .bottom)
+                        .ignoresSafeArea()
+                }
 
                 ScrollView {
                     VStack(spacing: 12) {
                         // Header
                         HStack {
-                            Image("logo3")
-                                .resizable()
-                                .frame(width: 30, height: 30)
+                            if UIImage(named: "logo3") != nil {
+                                Image("logo3")
+                                    .resizable()
+                                    .frame(width: 30, height: 30)
+                            } else {
+                                Image(systemName: "leaf.fill")
+                                    .resizable()
+                                    .frame(width: 30, height: 30)
+                                    .foregroundColor(.white)
+                            }
                             Text("康源华善")
                                 .foregroundColor(.white)
                                 .font(.system(size: 18, weight: .semibold))
@@ -142,7 +155,7 @@ struct LiveCenterView: View {
     }
 
     private func toggleReservation(liveId: Int) {
-        let isBooked = bookedLiveIds.contains(liveId)
+        let isBooked = bookedLiveIds.contains("\(liveId)")
         let message = isBooked ? "确定取消预约吗？" : "确定预约吗？"
 
         // Using alert approach since we can't use uni.showModal directly
@@ -224,7 +237,7 @@ struct LivingPreviewCard: View {
 
 struct TrailerSection: View {
     let trailerList: [LiveItem]
-    let bookedLiveIds: Set<Int>
+    let bookedLiveIds: Set<String>
     let onReserve: (Int) -> Void
 
     var body: some View {
@@ -266,12 +279,12 @@ struct TrailerSection: View {
                     }
 
                     Button(action: { onReserve(first.id) }) {
-                        Text(bookedLiveIds.contains(first.id) ? "取消预约" : "立即预约")
+                        Text(bookedLiveIds.contains("\(first.id)") ? "取消预约" : "立即预约")
                             .font(.system(size: 14))
-                            .foregroundColor(bookedLiveIds.contains(first.id) ? Color(hex: "6C6C6C") : .white)
+                            .foregroundColor(bookedLiveIds.contains("\(first.id)") ? Color(hex: "6C6C6C") : .white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 44)
-                            .background(bookedLiveIds.contains(first.id) ? Color(hex: "CCCCCC") : Color(hex: "0A9200"))
+                            .background(bookedLiveIds.contains("\(first.id)") ? Color(hex: "CCCCCC") : Color(hex: "0A9200"))
                             .cornerRadius(5)
                     }
                 }
