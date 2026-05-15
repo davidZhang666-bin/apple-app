@@ -9,6 +9,9 @@ struct LiveCenterView: View {
     @State private var page = 1
     @State private var isLoading = false
     @State private var isRefreshing = false
+    @State private var toastItem: ToastItem?
+    @State private var showLivingWebview = false
+    @State private var livingWebviewURL: String?
 
     private var isLiving: Bool { livingInfo != nil }
     private var trailerList: [LiveItem] { liveItems.filter { $0.live_status.status == 4 } }
@@ -21,30 +24,17 @@ struct LiveCenterView: View {
         NavigationStack {
             ZStack {
                 // Background
-                if UIImage(named: "home-bg") != nil {
-                    Image("home-bg")
-                        .resizable()
-                        .ignoresSafeArea()
-                } else {
-                    LinearGradient(colors: [Color(hex: "0A9200"), Color(hex: "065A00")],
-                                   startPoint: .top, endPoint: .bottom)
-                        .ignoresSafeArea()
-                }
+                Image("home-bg")
+                    .resizable()
+                    .ignoresSafeArea()
 
                 ScrollView {
                     VStack(spacing: 12) {
                         // Header
                         HStack {
-                            if UIImage(named: "logo3") != nil {
-                                Image("logo3")
-                                    .resizable()
-                                    .frame(width: 30, height: 30)
-                            } else {
-                                Image(systemName: "leaf.fill")
-                                    .resizable()
-                                    .frame(width: 30, height: 30)
-                                    .foregroundColor(.white)
-                            }
+                            Image("logo3")
+                                .resizable()
+                                .frame(width: 30, height: 30)
                             Text("康源华善")
                                 .foregroundColor(.white)
                                 .font(.system(size: 18, weight: .semibold))
@@ -82,8 +72,15 @@ struct LiveCenterView: View {
             }
             .navigationBarHidden(true)
         }
-        .task {
-            await loadData()
+        .onAppear {
+            Task { await loadData() }
+        }
+        .toast($toastItem)
+        .navigationDestination(isPresented: $showLivingWebview) {
+            if let urlStr = livingWebviewURL, let url = URL(string: urlStr) {
+                LivingWebView(url: url)
+                    .navigationTitle("直播")
+            }
         }
     }
 
@@ -108,7 +105,7 @@ struct LiveCenterView: View {
                 await fetchReservations()
             }
         } catch {
-            print("Failed to load live list: \(error)")
+            toastItem = ToastItem(message: error.localizedDescription)
         }
         isLoading = false
     }
@@ -141,7 +138,7 @@ struct LiveCenterView: View {
             let info: LiveStreamInfo = try await NetworkService.shared.get("/livesMaterial/getPullUrl", params: ["liveid": "\(liveId)"])
             livingStreamURL = info.pull_hls
         } catch {
-            print("Failed to fetch stream URL: \(error)")
+            toastItem = ToastItem(message: error.localizedDescription)
         }
     }
 
@@ -150,7 +147,7 @@ struct LiveCenterView: View {
             let response: ReservedLiveListResponse = try await NetworkService.shared.get("/livesMaterial/getReservedLiveList")
             reservedList = response.list
         } catch {
-            print("Failed to fetch reservations: \(error)")
+            toastItem = ToastItem(message: error.localizedDescription)
         }
     }
 
@@ -164,13 +161,49 @@ struct LiveCenterView: View {
                 let _: EmptyResponse = try await NetworkService.shared.get("/livesMaterial/reserveLive", params: ["liveId": "\(liveId)"])
                 await fetchReservations()
             } catch {
-                print("Reservation failed: \(error)")
+                toastItem = ToastItem(message: error.localizedDescription)
             }
         }
     }
 
     private func navigateToLivingWebview(_ item: LiveItem) {
-        // Will be handled by NavigationLink in LivingPreviewCard
+        Task {
+            guard let userInfo = AuthManager.shared.userInfo, let userId = userInfo.id else {
+                toastItem = ToastItem(message: "请先登录")
+                return
+            }
+
+            let secret = "3f1e6591f68710f5c804eff7bb963ad8"
+            let today = Date()
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyyMMdd"
+            let currentDate = formatter.string(from: today)
+            let md5Str = "\(secret)\(currentDate)\(userId)"
+            let authToken = CryptoUtils.md5(md5Str)
+
+            let params: [String: String] = [
+                "user_id": "\(userId)",
+                "auth_token": authToken,
+                "nick_name": userInfo.name ?? "用户",
+                "head_image": userInfo.avatar ?? "https://cdn.youinsh.cn/saas_pro/static/user/user-default.png",
+                "enterprise_id": "15579",
+                "next": "https://live.youinsh.com/livestream/watch/?liveid=\(item.id)&enterprise_id=15579&env=app&extra_info=xxx"
+            ]
+
+            do {
+                let urlStr = "https://pyapi.youinsh.com/livestreamapi/v1/user/watch_from_app_xcx/"
+                var components = URLComponents(string: urlStr)!
+                components.queryItems = params.map { URLQueryItem(name: $0.key, value: $0.value) }
+                guard let url = components.url else { return }
+
+                let (data, _) = try await URLSession.shared.data(from: url)
+                // After auth, navigate to webview with third_user_id
+                livingWebviewURL = "https://live.youinsh.com/livestream/watch/?liveid=\(item.id)&enterprise_id=15579&env=app&extra_info=xxx&third_user_id=\(userId)"
+                showLivingWebview = true
+            } catch {
+                toastItem = ToastItem(message: "观看直播失败")
+            }
+        }
     }
 }
 

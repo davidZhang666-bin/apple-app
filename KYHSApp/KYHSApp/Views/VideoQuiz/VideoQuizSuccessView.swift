@@ -1,13 +1,15 @@
 import SwiftUI
 
 struct VideoQuizSuccessView: View {
+    @Environment(\.dismiss) private var dismiss
+
     var body: some View {
         VStack(spacing: 16) {
-            Spacer().frame(height: 50)
+            Spacer().frame(height: 80)
 
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 98))
-                .foregroundColor(Color(hex: "0A9200"))
+            Image("videoquiz-success")
+                .resizable()
+                .frame(width: 98, height: 98)
 
             Text("恭喜您答题成功")
                 .font(.system(size: 18, weight: .bold))
@@ -18,20 +20,20 @@ struct VideoQuizSuccessView: View {
 
             Spacer().frame(height: 40)
 
-            Button(action: {
-                // Navigate back to video quiz tab
-            }) {
+            Button(action: { dismiss() }) {
                 Text("回到首页")
                     .font(.headline)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 44)
+                    .frame(height: 48)
             }
             .background(Color(hex: "0A9200"))
             .cornerRadius(10)
             .padding(.horizontal, 20)
+
+            Spacer()
         }
-        .navigationTitle("答题成功")
+        .navigationTitle("答题结果")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

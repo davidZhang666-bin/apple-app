@@ -3,19 +3,14 @@ import SwiftUI
 struct VideoQuizListView: View {
     @State private var quizList: [VideoQuizShareItem] = []
     @State private var isLoading = false
+    @State private var toastItem: ToastItem?
 
     var body: some View {
         NavigationStack {
             ZStack {
-                if UIImage(named: "home-bg") != nil {
-                    Image("home-bg")
-                        .resizable()
-                        .ignoresSafeArea()
-                } else {
-                    LinearGradient(colors: [Color(hex: "0A9200"), Color(hex: "065A00")],
-                                   startPoint: .top, endPoint: .bottom)
-                        .ignoresSafeArea()
-                }
+                Image("home-bg")
+                    .resizable()
+                    .ignoresSafeArea()
 
                 VStack(spacing: 0) {
                     if quizList.isEmpty && !isLoading {
@@ -57,6 +52,7 @@ struct VideoQuizListView: View {
         .task {
             await loadList()
         }
+        .toast($toastItem)
     }
 
     private func loadList() async {
@@ -65,7 +61,7 @@ struct VideoQuizListView: View {
             let items: [VideoQuizShareItem] = try await NetworkService.shared.get("/videoQuiz/getShopOwnerShareLinks")
             quizList = items
         } catch {
-            print("Failed to load quiz list: \(error)")
+            toastItem = ToastItem(message: error.localizedDescription)
         }
         isLoading = false
     }

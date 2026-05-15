@@ -19,6 +19,10 @@ struct VideoQuizAnswerView: View {
     @State private var luckyBagShowSeconds = 5.0
     @State private var answeringDuration = 0
     @State private var isSubmitting = false
+    @State private var toastItem: ToastItem?
+    @State private var linkExpired = false
+    @State private var showSuccess = false
+    @Environment(\.dismiss) private var dismiss
     @State private var showAnswerList: [AnswerResultItem] = []
     @State private var player: AVPlayer?
     @State private var isPlayerPlaying = false
@@ -172,14 +176,22 @@ struct VideoQuizAnswerView: View {
         .navigationTitle("视频答题")
         .navigationBarTitleDisplayMode(.inline)
         .task {
+            await checkLinkValidity()
             await loadData()
             await loadLuckyBagSettings()
             await loadLuckyBagShowTime()
+        }
+        .alert("此视频答题分享链接失效或已过期", isPresented: $linkExpired, actions: {
+            Button("确定") { dismiss() }
+        })
+        .navigationDestination(isPresented: $showSuccess) {
+            VideoQuizSuccessView()
         }
         .onDisappear {
             player?.pause()
             answerTimer?.invalidate()
         }
+        .toast($toastItem)
         // Lucky bag popup
         .overlay {
             if luckyBagPopupShow {
@@ -274,6 +286,14 @@ struct VideoQuizAnswerView: View {
 
     // MARK: - Data
 
+    private func checkLinkValidity() async {
+        do {
+            let _: EmptyResponse = try await NetworkService.shared.get("/videoQuiz/checkLinkValidity", params: ["id": quizId])
+        } catch {
+            linkExpired = true
+        }
+    }
+
     private func loadData() async {
         do {
             var d: VideoQuizFullDetail = try await NetworkService.shared.get("/videoQuiz/getDetail", params: ["id": quizId])
@@ -286,7 +306,7 @@ struct VideoQuizAnswerView: View {
             }
             detail = d
         } catch {
-            print("Failed to load quiz detail: \(error)")
+            toastItem = ToastItem(message: error.localizedDescription)
         }
     }
 
@@ -295,7 +315,7 @@ struct VideoQuizAnswerView: View {
             let setting: LuckyBagSetting = try await NetworkService.shared.get("/videoQuizLuckyBagSetting/getSetting")
             luckyBagSetting = setting
         } catch {
-            print("Failed to load lucky bag settings: \(error)")
+            toastItem = ToastItem(message: error.localizedDescription)
         }
     }
 
@@ -306,7 +326,7 @@ struct VideoQuizAnswerView: View {
                 luckyBagShowSeconds = d
             }
         } catch {
-            print("Failed to load lucky bag show time: \(error)")
+            toastItem = ToastItem(message: error.localizedDescription)
         }
     }
 
@@ -363,7 +383,7 @@ struct VideoQuizAnswerView: View {
                 luckyBagPoints = luckyBagSetting.points ?? 0
                 luckyBagPopupShow = true
             } catch {
-                print("Lucky bag claim failed: \(error)")
+                toastItem = ToastItem(message: error.localizedDescription)
             }
         }
     }
@@ -441,9 +461,9 @@ struct VideoQuizAnswerView: View {
             do {
                 let _: EmptyResponse = try await NetworkService.shared.post("/videoQuiz/submitAnswer", body: body, contentType: "application/json")
                 answerPopupShow = false
-                // Navigate to success
+                showSuccess = true
             } catch {
-                print("Submit failed: \(error)")
+                toastItem = ToastItem(message: error.localizedDescription)
             }
             isSubmitting = false
         }
