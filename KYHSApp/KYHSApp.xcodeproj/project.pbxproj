@@ -7,31 +7,30 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A10001 /* KYHSAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20001; };
-		A10002 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20002; };
-		A10003 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20003; };
-		A10004 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20004; };
-		A10005 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20005; };
-		A10006 /* PushNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20006; };
-		A10007 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20007; };
-		A10008 /* ServiceAgreementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20008; };
-		A10009 /* PrivacyPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20009; };
-		A10010 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20010; };
-		A10011 /* LiveCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20011; };
-		A10012 /* LivingWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20012; };
-		A10013 /* VideoQuizListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20013; };
-		A10014 /* VideoQuizAnswerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20014; };
-		A10015 /* VideoQuizSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20015; };
-		A10016 /* UserCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20016; };
-		A10017 /* MyProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20017; };
-		A10018 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20018; };
-		A10019 /* QRCodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20019; };
-		A10020 /* CommonWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20020; };
-		A10021 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20021; };
+		A10001 /* KYHSAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20001 /* KYHSAppApp.swift */; };
+		A10002 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20002 /* Models.swift */; };
+		A10003 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20003 /* NetworkService.swift */; };
+		A10004 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20004 /* KeychainManager.swift */; };
+		A10005 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20005 /* AuthManager.swift */; };
+		A10006 /* PushNotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20006 /* PushNotificationManager.swift */; };
+		A10007 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20007 /* LoginView.swift */; };
+		A10008 /* ServiceAgreementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20008 /* ServiceAgreementView.swift */; };
+		A10009 /* PrivacyPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20009 /* PrivacyPolicyView.swift */; };
+		A10010 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20010 /* MainTabView.swift */; };
+		A10011 /* LiveCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20011 /* LiveCenterView.swift */; };
+		A10012 /* LivingWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20012 /* LivingWebView.swift */; };
+		A10013 /* VideoQuizListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20013 /* VideoQuizListView.swift */; };
+		A10014 /* VideoQuizAnswerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20014 /* VideoQuizAnswerView.swift */; };
+		A10015 /* VideoQuizSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20015 /* VideoQuizSuccessView.swift */; };
+		A10016 /* UserCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20016 /* UserCenterView.swift */; };
+		A10017 /* MyProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20017 /* MyProfileView.swift */; };
+		A10018 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20018 /* SettingsView.swift */; };
+		A10019 /* QRCodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20019 /* QRCodeScannerView.swift */; };
+		A10020 /* CommonWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20020 /* CommonWebView.swift */; };
+		A10021 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20021 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A30001 /* KYHSApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KYHSApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20001 /* KYHSAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KYHSAppApp.swift; sourceTree = "<group>"; };
 		A20002 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		A20003 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
@@ -53,6 +52,7 @@
 		A20019 /* QRCodeScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeScannerView.swift; sourceTree = "<group>"; };
 		A20020 /* CommonWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonWebView.swift; sourceTree = "<group>"; };
 		A20021 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A30001 /* KYHSApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KYHSApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -340,6 +340,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -368,6 +369,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -403,7 +405,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
 	};
 	rootObject = A80001 /* Project object */;
 }

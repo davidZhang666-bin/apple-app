@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 import UserNotifications
 
 final class PushNotificationManager: NSObject, ObservableObject {

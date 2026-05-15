@@ -54,7 +54,14 @@ final class NetworkService {
             }
         }
 
-        let (data, _) = try await URLSession.shared.data(for: request)
+        print("🌐 \(method) \(url.absoluteString)")
+        let (data, response) = try await URLSession.shared.data(for: request)
+        if let httpResp = response as? HTTPURLResponse {
+            print("📡 \(httpResp.statusCode) \(url.lastPathComponent)")
+        }
+        if let raw = String(data: data, encoding: .utf8) {
+            print("📦 Response: \(raw.prefix(500))")
+        }
 
         guard let rawJSON = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let code = rawJSON["code"] as? Int else {

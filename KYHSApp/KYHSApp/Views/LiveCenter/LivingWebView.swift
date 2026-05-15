@@ -1,5 +1,5 @@
 import SwiftUI
-import WebKit
+@preconcurrency import WebKit
 
 struct LivingWebView: View {
     let url: URL
@@ -30,6 +30,7 @@ struct WebView: UIViewRepresentable {
         Coordinator()
     }
 
+    @MainActor
     class Coordinator: NSObject, WKNavigationDelegate {
         func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
             decisionHandler(.allow)

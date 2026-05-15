@@ -81,7 +81,7 @@ struct VideoQuizAnswerView: View {
                                 Image(systemName: "info.circle")
                                     .foregroundColor(Color(hex: "188600"))
                                     .font(.system(size: 12))
-                                Text("答题完成后，点击底部"提交"按钮完成答题")
+                                Text("答题完成后，点击底部\u{201C}提交\u{201D}按钮完成答题")
                                     .font(.system(size: 12))
                                     .foregroundColor(Color(hex: "188600"))
                             }
@@ -471,6 +471,6 @@ struct VideoQuizAnswerView: View {
 // MARK: - Answer Result Item
 
 struct AnswerResultItem {
-    let optionLabel: String
-    let isCorrect: Bool
+    var optionLabel: String
+    var isCorrect: Bool
 }

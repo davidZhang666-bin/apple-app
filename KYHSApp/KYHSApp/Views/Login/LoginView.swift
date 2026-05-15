@@ -7,6 +7,7 @@ struct LoginView: View {
     @State private var isAgree = false
     @State private var isLoading = false
     @State private var errorMessage: String?
+    @State private var showError = false
     @State private var showServiceAgreement = false
     @State private var showPrivacyPolicy = false
 
@@ -105,8 +106,8 @@ struct LoginView: View {
                 .frame(maxHeight: .infinity)
             }
         }
-        .alert("提示", isPresented: .constant(errorMessage != nil), actions: {
-            Button("确定") { errorMessage = nil }
+        .alert("提示", isPresented: $showError, actions: {
+            Button("确定") { }
         }, message: {
             Text(errorMessage ?? "")
         })
@@ -121,14 +122,17 @@ struct LoginView: View {
     private func handleLogin() {
         guard !username.isEmpty else {
             errorMessage = "请输入账号"
+            showError = true
             return
         }
         guard !password.isEmpty else {
             errorMessage = "请输入密码"
+            showError = true
             return
         }
         guard isAgree else {
             errorMessage = "请先同意《用户协议》和《隐私协议》"
+            showError = true
             return
         }
 
@@ -140,9 +144,13 @@ struct LoginView: View {
                 if let token = response.token, let userId = response.userId {
                     authManager.login(token: token, userId: userId)
                     await authManager.fetchUserInfo()
+                } else {
+                    errorMessage = "登录失败，请检查账号密码"
+                    showError = true
                 }
             } catch {
                 errorMessage = error.localizedDescription
+                showError = true
             }
             isLoading = false
         }

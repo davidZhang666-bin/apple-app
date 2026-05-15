@@ -70,10 +70,10 @@ struct VideoQuizShareStatus: Codable {
 struct VideoQuizFullDetail: Codable {
     let id: String
     let userTitle: String
-    let videoM3u8Url: String
+    var videoM3u8Url: String
     let duration: Double
     let expireTime: String?
-    let questions: [QuizQuestion]
+    var questions: [QuizQuestion]
 }
 
 struct QuizQuestion: Codable, Identifiable {
