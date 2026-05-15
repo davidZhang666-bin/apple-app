@@ -17,7 +17,6 @@ struct UserInfo: Codable {
 struct LoginResponse: Codable {
     let token: String?
     let userId: Int?
-    let code: Int?
 }
 
 // MARK: - Live Stream

@@ -77,15 +77,20 @@ final class NetworkService {
             throw NetworkError.serverError(rawJSON["msg"] as? String ?? "服务器错误")
         }
 
-        // Try direct decode first, then try .data field
+        // 对齐 demo: code == 200 时只解码 data 字段
+        if code == 200 {
+            if let dataField = rawJSON["data"] {
+                let dataJSON = try JSONSerialization.data(withJSONObject: dataField)
+                if let decoded = try? JSONDecoder().decode(T.self, from: dataJSON) {
+                    return decoded
+                }
+            }
+            throw NetworkError.decodingError
+        }
+
+        // 非 200 的其他 code，返回完整响应（兼容 appLogin 401 等场景）
         if let decoded = try? JSONDecoder().decode(T.self, from: data) {
             return decoded
-        }
-        if let dataField = rawJSON["data"] {
-            let dataJSON = try JSONSerialization.data(withJSONObject: dataField)
-            if let decoded = try? JSONDecoder().decode(T.self, from: dataJSON) {
-                return decoded
-            }
         }
         throw NetworkError.decodingError
     }
