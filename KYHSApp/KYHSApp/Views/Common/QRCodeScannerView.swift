@@ -29,7 +29,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
         view.backgroundColor = .black
 
         guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else {
-            showNoCameraAlert()
+            showNoCameraAlertDelayed()
             return
         }
 
@@ -40,7 +40,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
         if captureSession.canAddInput(videoInput) {
             captureSession.addInput(videoInput)
         } else {
-            showNoCameraAlert()
+            showNoCameraAlertDelayed()
             return
         }
 
@@ -51,7 +51,7 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
             metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
             metadataOutput.metadataObjectTypes = [.qr]
         } else {
-            showNoCameraAlert()
+            showNoCameraAlertDelayed()
             return
         }
 
@@ -96,13 +96,19 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
            let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject,
            let stringValue = readableObject.stringValue {
             AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
-            onScanned?(stringValue)
+            captureSession?.stopRunning() // 先停止扫描
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.onScanned?(stringValue)
+            }
         }
     }
 
-    private func showNoCameraAlert() {
-        let alert = UIAlertController(title: "提示", message: "无法访问相机", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "确定", style: .default) { _ in self.onDismiss?() })
-        present(alert, animated: true)
+    private func showNoCameraAlertDelayed() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self else { return }
+            let alert = UIAlertController(title: "提示", message: "模拟器无摄像头，请使用真机测试", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "确定", style: .default) { _ in self.onDismiss?() })
+            self.present(alert, animated: true)
+        }
     }
 }

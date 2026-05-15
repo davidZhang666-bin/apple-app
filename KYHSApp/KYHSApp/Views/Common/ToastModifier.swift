@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ToastItem: Identifiable {
+struct ToastItem: Identifiable, Equatable {
     let id = UUID()
     let message: String
 }

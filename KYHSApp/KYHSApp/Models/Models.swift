@@ -3,7 +3,7 @@ import Foundation
 // MARK: - User
 
 struct UserInfo: Codable {
-    let id: Int?
+    let id: String?
     let name: String?
     let phone: String?
     let avatar: String?

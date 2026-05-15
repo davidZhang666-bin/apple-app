@@ -1,5 +1,7 @@
 import Foundation
 
+struct EmptyResponse: Codable {}
+
 enum NetworkError: LocalizedError {
     case invalidURL
     case unauthorized
@@ -39,7 +41,11 @@ final class NetworkService {
         request.httpMethod = method
 
         if !ignoreToken, let token = KeychainManager.shared.getToken() {
+            print("🔑 Token已读取, 长度: \(token.count)")
+            print("🔑 Token前10位: \(token.prefix(10))...")
             request.setValue(token, forHTTPHeaderField: "token")
+        } else {
+            print("❌ Token未找到或为空")
         }
 
         if path != "/upload/uploadFile" {
@@ -84,14 +90,35 @@ final class NetworkService {
         // 对齐 demo: code == 200 时只解码 data 字段
         if code == 200 {
             if let dataField = rawJSON["data"] {
-                let dataJSON = try JSONSerialization.data(withJSONObject: dataField)
-                do {
-                    return try JSONDecoder().decode(T.self, from: dataJSON)
-                } catch {
-                    print("❌ 解码data字段失败: \(error)")
-                    print("📄 data内容: \(String(data: dataJSON, encoding: .utf8) ?? "")")
-                    throw NetworkError.decodingError
+                // 处理空字符串或空数据的情况（接口返回成功但无数据）
+                if (dataField is String && (dataField as? String ?? "").isEmpty) ||
+                   (dataField is NSNull) {
+                    if let empty = EmptyResponse() as? T {
+                        return empty
+                    }
                 }
+                // 只有字典或数组类型才用 JSONSerialization
+                if dataField is [String: Any] || dataField is [Any] {
+                    do {
+                        let dataJSON = try JSONSerialization.data(withJSONObject: dataField)
+                        do {
+                            return try JSONDecoder().decode(T.self, from: dataJSON)
+                        } catch {
+                            print("❌ 解码data字段失败: \(error)")
+                            print("📄 data内容: \(String(data: dataJSON, encoding: .utf8) ?? "")")
+                            throw NetworkError.decodingError
+                        }
+                    } catch {
+                        print("❌ JSON序列化失败: \(error), dataField类型: \(type(of: dataField))")
+                    }
+                } else {
+                    print("ℹ️ dataField不是字典/数组类型: \(type(of: dataField)), 值: \(dataField)")
+                }
+                // 其他类型或序列化失败，尝试返回空响应
+                if let empty = EmptyResponse() as? T {
+                    return empty
+                }
+                throw NetworkError.decodingError
             }
             print("❌ code=200但无data字段")
             throw NetworkError.decodingError

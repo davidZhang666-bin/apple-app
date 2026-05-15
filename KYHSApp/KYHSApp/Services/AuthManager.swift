@@ -1,5 +1,6 @@
 import SwiftUI
 
+@MainActor
 final class AuthManager: ObservableObject {
     static let shared = AuthManager()
 
@@ -18,9 +19,14 @@ final class AuthManager: ObservableObject {
     }
 
     func login(token: String, userId: String) {
+        print("🔐 保存Token, 长度: \(token.count)")
+        print("🔐 保存UserId: \(userId)")
         KeychainManager.shared.saveToken(token)
         KeychainManager.shared.saveUserId(userId)
         isAuthenticated = true
+        // 验证是否保存成功
+        let savedToken = KeychainManager.shared.getToken()
+        print("🔐 验证Token保存结果: \(savedToken != nil ? "成功" : "失败")")
     }
 
     func logout() {
@@ -33,10 +39,11 @@ final class AuthManager: ObservableObject {
     func fetchUserInfo() async {
         do {
             let info: UserInfo = try await NetworkService.shared.post("/sysUser/getUserInfo")
+            print("👤 获取到用户信息: \(info.name ?? "无"), phone: \(info.phone ?? "无")")
             userInfo = info
             cacheUserInfo(info)
         } catch {
-            print("Failed to fetch user info: \(error)")
+            print("❌ 获取用户信息失败: \(error)")
         }
     }
 

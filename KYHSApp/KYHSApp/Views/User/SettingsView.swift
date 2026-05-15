@@ -46,6 +46,7 @@ struct SettingsView: View {
         storageSize = "\(size / 1024)KB"
     }
 
+    @MainActor
     private func clearCache() {
         UserDefaults.standard.dictionaryRepresentation().keys.forEach { key in
             if key != "AppleLanguages" && key != "AppleLocale" {

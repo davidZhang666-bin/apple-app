@@ -1,6 +1,7 @@
 import SwiftUI
 
 @main
+@MainActor
 struct KYHSAppApp: App {
     @StateObject private var authManager = AuthManager.shared
 

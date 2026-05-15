@@ -13,15 +13,13 @@ struct LoginView: View {
 
     var body: some View {
         ZStack {
-            // Background gradient matching original
             LinearGradient(colors: [Color(hex: "FFFFD4"), Color(hex: "D1FBD8")],
                            startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
+                .ignoresSafeArea(.container, edges: .top)
 
-            VStack {
+            VStack(spacing: 0) {
                 Spacer().frame(height: 80)
 
-                // Logo
                 Image("login-logo")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
@@ -30,80 +28,103 @@ struct LoginView: View {
 
                 Spacer().frame(height: 34)
 
-                // White card
                 VStack(spacing: 0) {
-                    // Form
-                    VStack(spacing: 16) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("账号")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            TextField("请输入账号", text: $username)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .autocapitalization(.none)
-                        }
+                    Spacer().frame(height: 32)
 
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("密码")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            SecureField("请输入密码", text: $password)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                        }
+                    // 账号输入
+                    HStack(spacing: 12) {
+                        Image(systemName: "person.fill")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: 18))
+                            .frame(width: 20)
+                        TextField("请输入账号", text: $username)
+                            .font(.system(size: 16))
+                            .autocapitalization(.none)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .background(Color(hex: "F7F8FA"))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .padding(.horizontal, 24)
 
-                        Button(action: handleLogin) {
+                    Spacer().frame(height: 16)
+
+                    // 密码输入
+                    HStack(spacing: 12) {
+                        Image(systemName: "lock.fill")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: 18))
+                            .frame(width: 20)
+                        SecureField("请输入密码", text: $password)
+                            .font(.system(size: 16))
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .background(Color(hex: "F7F8FA"))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .padding(.horizontal, 24)
+
+                    Spacer().frame(height: 28)
+
+                    // 登录按钮
+                    Button(action: handleLogin) {
+                        Group {
                             if isLoading {
                                 ProgressView()
                                     .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 48)
                             } else {
                                 Text("登录")
-                                    .font(.headline)
+                                    .font(.system(size: 17, weight: .semibold))
                                     .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 48)
                             }
                         }
-                        .background(Color(hex: "0A9200"))
-                        .cornerRadius(10)
-                        .disabled(isLoading)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
                     }
-                    .padding(.horizontal, 25)
+                    .background(
+                        LinearGradient(colors: [Color(hex: "0AB00A"), Color(hex: "0A9200")],
+                                       startPoint: .leading, endPoint: .trailing)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 25))
+                    .padding(.horizontal, 24)
+                    .disabled(isLoading)
 
-                    // Agreement
-                    HStack(spacing: 4) {
+                    // 协议
+                    HStack(spacing: 6) {
+                        Spacer()
                         Button(action: { isAgree.toggle() }) {
                             Image(systemName: isAgree ? "checkmark.circle.fill" : "circle")
-                                .foregroundColor(isAgree ? Color(hex: "0A9200") : .gray)
-                                .font(.title3)
+                                .foregroundColor(isAgree ? Color(hex: "0A9200") : Color(hex: "CCCCCC"))
+                                .font(.system(size: 16))
                         }
-                        HStack(spacing: 2) {
+                        HStack(spacing: 0) {
                             Text("我同意康源华善")
-                                .font(.caption)
+                                .font(.system(size: 12))
+                                .foregroundColor(Color(hex: "999999"))
                             Button(action: { showServiceAgreement = true }) {
                                 Text("《服务协议》")
-                                    .font(.caption)
+                                    .font(.system(size: 12))
                                     .foregroundColor(Color(hex: "0A9200"))
                             }
                             Text("和")
-                                .font(.caption)
+                                .font(.system(size: 12))
+                                .foregroundColor(Color(hex: "999999"))
                             Button(action: { showPrivacyPolicy = true }) {
                                 Text("《隐私政策》")
-                                    .font(.caption)
+                                    .font(.system(size: 12))
                                     .foregroundColor(Color(hex: "0A9200"))
                             }
                         }
                         Spacer()
                     }
-                    .padding(.top, 16)
-                    .padding(.horizontal, 25)
+                    .padding(.top, 20)
 
                     Spacer().frame(height: 30)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.white)
-                .cornerRadius(25, corners: [.topLeft, .topRight])
-                .frame(maxHeight: .infinity)
+                .clipShape(UnevenRoundedRectangle(topLeadingRadius: 25, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 25))
+                .shadow(color: .black.opacity(0.05), radius: 10, y: -5)
             }
         }
         .alert("提示", isPresented: $showError, actions: {

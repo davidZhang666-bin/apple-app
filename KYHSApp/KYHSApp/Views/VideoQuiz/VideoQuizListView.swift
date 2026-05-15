@@ -13,6 +13,12 @@ struct VideoQuizListView: View {
                     .ignoresSafeArea()
 
                 VStack(spacing: 0) {
+                    Text("视频答题列表")
+                        .font(.system(size: 15, weight: .bold))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 60)
+                        .padding(.horizontal, 16)
+
                     if quizList.isEmpty && !isLoading {
                         Spacer()
                         VStack(spacing: 8) {
@@ -25,21 +31,15 @@ struct VideoQuizListView: View {
                         Spacer()
                     } else {
                         ScrollView {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("视频答题列表")
-                                    .font(.system(size: 15, weight: .bold))
-                                    .padding(.top, 60)
-
-                                LazyVStack(spacing: 8) {
-                                    ForEach(quizList) { item in
-                                        NavigationLink(destination: VideoQuizAnswerView(
-                                            quizId: item.quizId,
-                                            activeLinkId: item.videoQuiz.videoQuizShareStatusVO.activeLinkId
-                                        )) {
-                                            QuizCard(item: item)
-                                        }
-                                        .buttonStyle(PlainButtonStyle())
+                            LazyVStack(spacing: 8) {
+                                ForEach(quizList) { item in
+                                    NavigationLink(destination: VideoQuizAnswerView(
+                                        quizId: item.quizId,
+                                        activeLinkId: item.videoQuiz.videoQuizShareStatusVO.activeLinkId
+                                    )) {
+                                        QuizCard(item: item)
                                     }
+                                    .buttonStyle(PlainButtonStyle())
                                 }
                             }
                             .padding(.horizontal, 16)

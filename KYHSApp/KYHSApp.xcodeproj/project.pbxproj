@@ -27,6 +27,8 @@
 		A10018 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20018 /* SettingsView.swift */; };
 		A10019 /* QRCodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20019 /* QRCodeScannerView.swift */; };
 		A10020 /* CommonWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20020 /* CommonWebView.swift */; };
+		A10022 /* ToastModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20022 /* ToastModifier.swift */; };
+		A10023 /* CryptoUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20023 /* CryptoUtils.swift */; };
 		A10021 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20021 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -51,6 +53,8 @@
 		A20018 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A20019 /* QRCodeScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeScannerView.swift; sourceTree = "<group>"; };
 		A20020 /* CommonWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonWebView.swift; sourceTree = "<group>"; };
+		A20022 /* ToastModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastModifier.swift; sourceTree = "<group>"; };
+		A20023 /* CryptoUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoUtils.swift; sourceTree = "<group>"; };
 		A20021 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A30001 /* KYHSApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KYHSApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -109,6 +113,7 @@
 				A20004 /* KeychainManager.swift */,
 				A20005 /* AuthManager.swift */,
 				A20006 /* PushNotificationManager.swift */,
+				A20023 /* CryptoUtils.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -170,6 +175,7 @@
 				A20010 /* MainTabView.swift */,
 				A20019 /* QRCodeScannerView.swift */,
 				A20020 /* CommonWebView.swift */,
+				A20022 /* ToastModifier.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -263,6 +269,8 @@
 				A10018 /* SettingsView.swift in Sources */,
 				A10019 /* QRCodeScannerView.swift in Sources */,
 				A10020 /* CommonWebView.swift in Sources */,
+				A10022 /* ToastModifier.swift in Sources */,
+				A10023 /* CryptoUtils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

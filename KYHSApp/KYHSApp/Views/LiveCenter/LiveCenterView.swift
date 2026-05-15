@@ -57,7 +57,7 @@ struct LiveCenterView: View {
                         }
                         .padding(.horizontal, 16)
 
-                        // Past streams
+                        // Past streams - 独立滚动区域
                         PastStreamsSection(endList: endList, hasMore: endList.count > 0) {
                             loadMore()
                         }
@@ -167,7 +167,7 @@ struct LiveCenterView: View {
     }
 
     private func navigateToLivingWebview(_ item: LiveItem) {
-        Task {
+        Task { @MainActor in
             guard let userInfo = AuthManager.shared.userInfo, let userId = userInfo.id else {
                 toastItem = ToastItem(message: "请先登录")
                 return
@@ -207,9 +207,6 @@ struct LiveCenterView: View {
     }
 }
 
-// MARK: - Empty Response
-
-struct EmptyResponse: Codable {}
 
 // MARK: - Living Preview Card
 
@@ -370,45 +367,67 @@ struct PastStreamsSection: View {
                 }
                 .frame(height: 150)
             } else {
-                LazyVStack(spacing: 8) {
-                    ForEach(endList) { item in
-                        HStack(spacing: 15) {
-                            AsyncImage(url: URL(string: item.image)) { image in
-                                image.resizable().aspectRatio(contentMode: .fill)
-                            } placeholder: {
-                                Rectangle().fill(Color.gray.opacity(0.2))
-                            }
-                            .frame(width: 100, height: 71)
-                            .clipped()
-                            .cornerRadius(5)
-
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(item.title)
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .lineLimit(1)
-                                Text("直播时间：\(item.start_time ?? "")")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.secondary)
-                                HStack(spacing: 10) {
-                                    Text("直播人：\(item.nickname ?? "")")
-                                    Text("观看人次：\(item.tp_pv ?? 0)")
+                ScrollView {
+                    LazyVStack(spacing: 8) {
+                        ForEach(endList) { item in
+                            HStack(alignment: .center, spacing: 12) {
+                                AsyncImage(url: URL(string: item.image)) { image in
+                                    image.resizable().aspectRatio(contentMode: .fill)
+                                } placeholder: {
+                                    Rectangle().fill(Color.gray.opacity(0.2))
                                 }
-                                .font(.system(size: 12))
-                                .foregroundColor(.secondary)
+                                .frame(width: 100, height: 71)
+                                .clipped()
+                                .cornerRadius(5)
+
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text(item.title)
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .lineLimit(1)
+
+                                    Text("直播时间：\(item.start_time ?? "")")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(.secondary)
+
+                                    HStack(spacing: 0) {
+                                        // 平台图标
+                                        HStack(spacing: 4) {
+                                            Image(systemName: "play.circle.fill")
+                                                .font(.system(size: 12))
+                                                .foregroundColor(.blue)
+                                            Image(systemName: "cart.fill")
+                                                .font(.system(size: 12))
+                                                .foregroundColor(.orange)
+                                            Image(systemName: "message.fill")
+                                                .font(.system(size: 12))
+                                                .foregroundColor(.green)
+                                            Image(systemName: "camera.filters")
+                                                .font(.system(size: 12))
+                                                .foregroundColor(.purple)
+                                        }
+
+                                        Spacer()
+
+                                        Text("观看：\(item.tp_pv ?? 0)")
+                                            .font(.system(size: 12))
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
                             }
                         }
-                    }
 
-                    if hasMore {
-                        Button("加载更多") {
-                            onLoadMore()
+                        if hasMore {
+                            Button("加载更多") {
+                                onLoadMore()
+                            }
+                            .font(.system(size: 14))
+                            .foregroundColor(Color(hex: "0A9200"))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 8)
                         }
-                        .font(.system(size: 14))
-                        .foregroundColor(Color(hex: "0A9200"))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
                     }
                 }
+                .frame(height: 300) // 固定高度，实现独立滚动
             }
         }
         .padding(15)
