@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct LoginView: View {
     @EnvironmentObject var authManager: AuthManager
@@ -10,6 +11,8 @@ struct LoginView: View {
     @State private var showError = false
     @State private var showServiceAgreement = false
     @State private var showPrivacyPolicy = false
+    @State private var showProtocolAlert = false
+    @State private var pendingLoginAction: (() -> Void)?
 
     var body: some View {
         ZStack {
@@ -24,9 +27,9 @@ struct LoginView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 275, height: 76)
-                    .padding(.leading, 25)
+                    .padding(.leading, 24)
 
-                Spacer().frame(height: 34)
+                Spacer().frame(height: 32)
 
                 VStack(spacing: 0) {
                     Spacer().frame(height: 32)
@@ -47,7 +50,7 @@ struct LoginView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .padding(.horizontal, 24)
 
-                    Spacer().frame(height: 16)
+                    Spacer().frame(height: 14)
 
                     // 密码输入
                     HStack(spacing: 12) {
@@ -64,7 +67,7 @@ struct LoginView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .padding(.horizontal, 24)
 
-                    Spacer().frame(height: 28)
+                    Spacer().frame(height: 26)
 
                     // 登录按钮
                     Button(action: handleLogin) {
@@ -90,36 +93,52 @@ struct LoginView: View {
                     .disabled(isLoading)
 
                     // 协议
-                    HStack(spacing: 6) {
+                    HStack(spacing: 4) {
                         Spacer()
                         Button(action: { isAgree.toggle() }) {
                             Image(systemName: isAgree ? "checkmark.circle.fill" : "circle")
                                 .foregroundColor(isAgree ? Color(hex: "0A9200") : Color(hex: "CCCCCC"))
                                 .font(.system(size: 16))
                         }
-                        HStack(spacing: 0) {
-                            Text("我同意康源华善")
-                                .font(.system(size: 12))
-                                .foregroundColor(Color(hex: "999999"))
-                            Button(action: { showServiceAgreement = true }) {
-                                Text("《服务协议》")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(Color(hex: "0A9200"))
-                            }
-                            Text("和")
-                                .font(.system(size: 12))
-                                .foregroundColor(Color(hex: "999999"))
-                            Button(action: { showPrivacyPolicy = true }) {
-                                Text("《隐私政策》")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(Color(hex: "0A9200"))
-                            }
+                        Text("我同意康源华善")
+                            .font(.system(size: 11.5))
+                            .foregroundColor(Color(hex: "999999"))
+                        Button(action: { showServiceAgreement = true }) {
+                            Text("《服务协议》")
+                                .font(.system(size: 11.5))
+                                .foregroundColor(Color(hex: "0A9200"))
+                        }
+                        Text("和")
+                            .font(.system(size: 11.5))
+                            .foregroundColor(Color(hex: "999999"))
+                        Button(action: { showPrivacyPolicy = true }) {
+                            Text("《隐私政策》")
+                                .font(.system(size: 11.5))
+                                .foregroundColor(Color(hex: "0A9200"))
                         }
                         Spacer()
                     }
-                    .padding(.top, 20)
+                    .padding(.top, 18)
 
-                    Spacer().frame(height: 30)
+                    // 微信登录
+                    Spacer().frame(height: 18)
+
+                    Button(action: handleWeChatLogin) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "message.fill")
+                                .font(.system(size: 18))
+                                .foregroundColor(Color(hex: "07C160"))
+                            Text("微信登录")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(Color(hex: "666666"))
+                        }
+                        .padding(.horizontal, 22)
+                        .padding(.vertical, 10)
+                        .background(Color(hex: "F7F8FA"))
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+
+                    Spacer().frame(height: 32)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.white)
@@ -131,6 +150,16 @@ struct LoginView: View {
             Button("确定") { }
         }, message: {
             Text(errorMessage ?? "")
+        })
+        .alert("提示", isPresented: $showProtocolAlert, actions: {
+            Button("取消", role: .cancel) { }
+            Button("我同意") {
+                isAgree = true
+                pendingLoginAction?()
+                pendingLoginAction = nil
+            }
+        }, message: {
+            Text("请先同意《服务协议》和《隐私政策》")
         })
         .sheet(isPresented: $showServiceAgreement) {
             ServiceAgreementView()
@@ -152,11 +181,14 @@ struct LoginView: View {
             return
         }
         guard isAgree else {
-            errorMessage = "请先同意《用户协议》和《隐私协议》"
-            showError = true
+            pendingLoginAction = doLogin
+            showProtocolAlert = true
             return
         }
+        doLogin()
+    }
 
+    private func doLogin() {
         isLoading = true
         Task {
             do {
@@ -176,63 +208,20 @@ struct LoginView: View {
             isLoading = false
         }
     }
-}
 
-// MARK: - Rounded Corner Helper
-
-extension View {
-    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
-        clipShape(RoundedCornerShape(radius: radius, corners: corners))
+    private func handleWeChatLogin() {
+        guard isAgree else {
+            pendingLoginAction = doWeChatLogin
+            showProtocolAlert = true
+            return
+        }
+        doWeChatLogin()
     }
-}
 
-struct RoundedCornerShape: Shape {
-    var radius: CGFloat = .infinity
-    var corners: UIRectCorner = .allCorners
-
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let tl = CGPoint(x: rect.minX, y: rect.minY)
-        let tr = CGPoint(x: rect.maxX, y: rect.minY)
-        let bl = CGPoint(x: rect.minX, y: rect.maxY)
-        let br = CGPoint(x: rect.maxX, y: rect.maxY)
-
-        if corners.contains(.topLeft) {
-            path.move(to: CGPoint(x: tl.x + radius, y: tl.y))
-        } else {
-            path.move(to: tl)
-        }
-
-        if corners.contains(.topRight) {
-            path.addLine(to: CGPoint(x: tr.x - radius, y: tr.y))
-            path.addArc(center: CGPoint(x: tr.x - radius, y: tr.y + radius), radius: radius, startAngle: .degrees(-90), endAngle: .degrees(0), clockwise: false)
-        } else {
-            path.addLine(to: tr)
-        }
-
-        if corners.contains(.bottomRight) {
-            path.addLine(to: CGPoint(x: br.x, y: br.y - radius))
-            path.addArc(center: CGPoint(x: br.x - radius, y: br.y - radius), radius: radius, startAngle: .degrees(0), endAngle: .degrees(90), clockwise: false)
-        } else {
-            path.addLine(to: br)
-        }
-
-        if corners.contains(.bottomLeft) {
-            path.addLine(to: CGPoint(x: bl.x + radius, y: bl.y))
-            path.addArc(center: CGPoint(x: bl.x + radius, y: bl.y - radius), radius: radius, startAngle: .degrees(90), endAngle: .degrees(180), clockwise: false)
-        } else {
-            path.addLine(to: bl)
-        }
-
-        if corners.contains(.topLeft) {
-            path.addLine(to: CGPoint(x: tl.x, y: tl.y + radius))
-            path.addArc(center: CGPoint(x: tl.x + radius, y: tl.y + radius), radius: radius, startAngle: .degrees(180), endAngle: .degrees(270), clockwise: false)
-        } else {
-            path.addLine(to: tl)
-        }
-
-        path.closeSubpath()
-        return path
+    private func doWeChatLogin() {
+        // TODO: 接入微信 SDK 后替换为实际调用
+        errorMessage = "微信登录功能开发中"
+        showError = true
     }
 }
 
