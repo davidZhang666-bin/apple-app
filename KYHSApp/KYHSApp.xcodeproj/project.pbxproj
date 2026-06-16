@@ -27,9 +27,10 @@
 		A10018 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20018 /* SettingsView.swift */; };
 		A10019 /* QRCodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20019 /* QRCodeScannerView.swift */; };
 		A10020 /* CommonWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20020 /* CommonWebView.swift */; };
+		A10021 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20021 /* Assets.xcassets */; };
 		A10022 /* ToastModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20022 /* ToastModifier.swift */; };
 		A10023 /* CryptoUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20023 /* CryptoUtils.swift */; };
-		A10021 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20021 /* Assets.xcassets */; };
+		A10024 /* RefreshableCompat.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20024 /* RefreshableCompat.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,9 +54,10 @@
 		A20018 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A20019 /* QRCodeScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeScannerView.swift; sourceTree = "<group>"; };
 		A20020 /* CommonWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonWebView.swift; sourceTree = "<group>"; };
+		A20021 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A20022 /* ToastModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastModifier.swift; sourceTree = "<group>"; };
 		A20023 /* CryptoUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoUtils.swift; sourceTree = "<group>"; };
-		A20021 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A20024 /* RefreshableCompat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshableCompat.swift; sourceTree = "<group>"; };
 		A30001 /* KYHSApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KYHSApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -176,6 +178,7 @@
 				A20019 /* QRCodeScannerView.swift */,
 				A20020 /* CommonWebView.swift */,
 				A20022 /* ToastModifier.swift */,
+				A20024 /* RefreshableCompat.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -271,6 +274,7 @@
 				A10020 /* CommonWebView.swift in Sources */,
 				A10022 /* ToastModifier.swift in Sources */,
 				A10023 /* CryptoUtils.swift in Sources */,
+				A10024 /* RefreshableCompat.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -299,7 +303,7 @@
 				);
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -324,7 +328,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -340,7 +344,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = M2PUAW2P5N;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = KYHSApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "康源华善";
@@ -348,7 +352,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -356,9 +360,13 @@
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = cn.kangyuanhuashan.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -369,7 +377,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = M2PUAW2P5N;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = KYHSApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "康源华善";
@@ -377,7 +385,7 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -385,9 +393,13 @@
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = cn.kangyuanhuashan.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

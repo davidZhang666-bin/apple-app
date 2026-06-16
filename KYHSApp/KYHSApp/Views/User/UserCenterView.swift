@@ -7,8 +7,12 @@ struct UserCenterView: View {
     @State private var showClockInSuccess = false
     @State private var scanError: String?
 
+    init() {
+        UITableView.appearance().backgroundColor = .clear
+    }
+
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ZStack {
                 Color(hex: "F2F2F7")
                     .ignoresSafeArea()
@@ -59,7 +63,6 @@ struct UserCenterView: View {
                     }
                     .listStyle(.insetGrouped)
                     .background(Color.clear)
-                    .scrollContentBackground(.hidden)
 
                     // Logout button
                     Button(action: {
@@ -100,6 +103,7 @@ struct UserCenterView: View {
                 Text(scanError ?? "")
             })
         }
+        .navigationViewStyle(.stack)
     }
 
     private func handleScanResult(_ ruleId: String) {

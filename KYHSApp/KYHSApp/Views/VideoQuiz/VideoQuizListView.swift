@@ -4,9 +4,11 @@ struct VideoQuizListView: View {
     @State private var quizList: [VideoQuizShareItem] = []
     @State private var isLoading = false
     @State private var toastItem: ToastItem?
+    @State private var selectedItem: VideoQuizShareItem?
+    @State private var isAnswerActive = false
 
     var body: some View {
-        NavigationStack {
+        NavigationView {
             ZStack {
                 Image("home-bg")
                     .resizable()
@@ -19,24 +21,24 @@ struct VideoQuizListView: View {
                         .padding(.top, 60)
                         .padding(.horizontal, 16)
 
-                    if quizList.isEmpty && !isLoading {
-                        Spacer()
-                        VStack(spacing: 8) {
-                            Image(systemName: "tray")
-                                .font(.largeTitle)
-                                .foregroundColor(.gray.opacity(0.5))
-                            Text("暂无数据")
-                                .foregroundColor(.secondary)
-                        }
-                        Spacer()
-                    } else {
-                        ScrollView {
+                    ScrollView {
+                        if quizList.isEmpty && !isLoading {
+                            VStack(spacing: 8) {
+                                Image(systemName: "tray")
+                                    .font(.largeTitle)
+                                    .foregroundColor(.gray.opacity(0.5))
+                                Text("暂无数据")
+                                    .foregroundColor(.secondary)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.top, 120)
+                        } else {
                             LazyVStack(spacing: 8) {
                                 ForEach(quizList) { item in
-                                    NavigationLink(destination: VideoQuizAnswerView(
-                                        quizId: item.quizId,
-                                        activeLinkId: item.videoQuiz.videoQuizShareStatusVO.activeLinkId
-                                    )) {
+                                    Button(action: {
+                                        selectedItem = item
+                                        isAnswerActive = true
+                                    }) {
                                         QuizCard(item: item)
                                     }
                                     .buttonStyle(PlainButtonStyle())
@@ -45,10 +47,30 @@ struct VideoQuizListView: View {
                             .padding(.horizontal, 16)
                         }
                     }
+                    .compatRefreshable {
+                        await loadList()
+                    }
                 }
             }
             .navigationBarHidden(true)
+            .background(
+                NavigationLink(
+                    isActive: $isAnswerActive,
+                    destination: {
+                        if let item = selectedItem {
+                            VideoQuizAnswerView(
+                                quizId: item.quizId,
+                                linkId: item.id,
+                                activeLinkId: item.videoQuiz.videoQuizShareStatusVO.activeLinkId,
+                                popToRoot: { isAnswerActive = false }
+                            )
+                        }
+                    },
+                    label: { EmptyView() }
+                )
+            )
         }
+        .navigationViewStyle(.stack)
         .task {
             await loadList()
         }
@@ -57,13 +79,24 @@ struct VideoQuizListView: View {
 
     private func loadList() async {
         isLoading = true
-        do {
-            let items: [VideoQuizShareItem] = try await NetworkService.shared.get("/videoQuiz/getShopOwnerShareLinks")
-            quizList = items
-        } catch {
-            toastItem = ToastItem(message: error.localizedDescription)
+        let work = Task.detached {
+            do {
+                let items: [VideoQuizShareItem] = try await NetworkService.shared.get("/videoQuiz/getShopOwnerShareLinks")
+                await MainActor.run {
+                    self.quizList = items
+                    self.isLoading = false
+                }
+            } catch {
+                await MainActor.run {
+                    let isCancel = error is CancellationError || (error as? URLError)?.code == .cancelled
+                    if !isCancel {
+                        self.toastItem = ToastItem(message: error.localizedDescription)
+                    }
+                    self.isLoading = false
+                }
+            }
         }
-        isLoading = false
+        _ = await work.value
     }
 }
 

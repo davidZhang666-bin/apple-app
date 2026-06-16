@@ -49,19 +49,19 @@ struct ReservedLiveListResponse: Codable {
 
 // MARK: - Video Quiz
 
-struct VideoQuizShareItem: Codable, Identifiable {
-    var id: String { quizId }
+struct VideoQuizShareItem: Codable, Identifiable, Hashable {
+    let id: String
     let quizId: String
     let videoQuiz: VideoQuizDetail
 }
 
-struct VideoQuizDetail: Codable {
+struct VideoQuizDetail: Codable, Hashable {
     let userTitle: String
     let img: String
     let videoQuizShareStatusVO: VideoQuizShareStatus
 }
 
-struct VideoQuizShareStatus: Codable {
+struct VideoQuizShareStatus: Codable, Hashable {
     let activeLinkExpireTime: String
     let activeLinkId: String
 }
@@ -86,13 +86,17 @@ struct QuizOption: Codable, Identifiable {
     let id: String
     let optionLabel: String
     let optionContent: String
-    let isCorrect: Bool?
+    let isCorrect: Int?
     var isUserSelected: Bool = false
+
+    enum CodingKeys: String, CodingKey {
+        case id, optionLabel, optionContent, isCorrect
+    }
 }
 
 struct LuckyBagSetting: Codable {
     let enabled: Int?
-    let points: Int?
+    let points: String?
 }
 
 struct LuckyBagShowTime: Codable {

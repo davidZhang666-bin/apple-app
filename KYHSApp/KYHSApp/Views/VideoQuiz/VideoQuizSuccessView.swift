@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct VideoQuizSuccessView: View {
+    var onBackToList: (() -> Void)?
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -20,7 +21,13 @@ struct VideoQuizSuccessView: View {
 
             Spacer().frame(height: 40)
 
-            Button(action: { dismiss() }) {
+            Button(action: {
+                if let onBackToList = onBackToList {
+                    onBackToList()
+                } else {
+                    dismiss()
+                }
+            }) {
                 Text("回到首页")
                     .font(.headline)
                     .foregroundColor(.white)
@@ -35,6 +42,7 @@ struct VideoQuizSuccessView: View {
         }
         .navigationTitle("答题结果")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
     }
 }
 

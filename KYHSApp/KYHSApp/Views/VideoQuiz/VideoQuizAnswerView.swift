@@ -3,7 +3,9 @@ import AVKit
 
 struct VideoQuizAnswerView: View {
     let quizId: String
+    let linkId: String
     let activeLinkId: String
+    let popToRoot: () -> Void
 
     @State private var detail: VideoQuizFullDetail?
     @State private var isVideoFinished = false
@@ -15,7 +17,7 @@ struct VideoQuizAnswerView: View {
     @State private var luckyBagTime: Double = 0
     @State private var luckyBagCurrentCount = 1
     @State private var luckyBagTotalCount = 3
-    @State private var luckyBagSetting = LuckyBagSetting(enabled: 1, points: 5)
+    @State private var luckyBagSetting = LuckyBagSetting(enabled: 1, points: "5")
     @State private var luckyBagShowSeconds = 5.0
     @State private var answeringDuration = 0
     @State private var isSubmitting = false
@@ -36,11 +38,19 @@ struct VideoQuizAnswerView: View {
                 // Video area
                 if !isVideoFinished, let detail = detail {
                     ZStack {
-                        VideoPlayer(player: player)
-                            .frame(height: 220)
-                            .onAppear {
-                                setupPlayer()
-                            }
+                        if let player = player {
+                            LinearVideoPlayer(player: player)
+                                .frame(height: 220)
+                                .onAppear {
+                                    if player.rate == 0 { player.play() }
+                                }
+                        } else {
+                            Color.black
+                                .frame(height: 220)
+                                .onAppear {
+                                    setupPlayer()
+                                }
+                        }
 
                         if luckyBagShow {
                             Button(action: claimLuckyBag) {
@@ -175,6 +185,17 @@ struct VideoQuizAnswerView: View {
         }
         .navigationTitle("视频答题")
         .navigationBarTitleDisplayMode(.inline)
+        .background(
+            NavigationLink(
+                isActive: $showSuccess,
+                destination: {
+                    VideoQuizSuccessView {
+                        popToRoot()
+                    }
+                },
+                label: { EmptyView() }
+            )
+        )
         .task {
             await checkLinkValidity()
             await loadData()
@@ -184,9 +205,6 @@ struct VideoQuizAnswerView: View {
         .alert("此视频答题分享链接失效或已过期", isPresented: $linkExpired, actions: {
             Button("确定") { dismiss() }
         })
-        .navigationDestination(isPresented: $showSuccess) {
-            VideoQuizSuccessView()
-        }
         .onDisappear {
             player?.pause()
             answerTimer?.invalidate()
@@ -288,7 +306,7 @@ struct VideoQuizAnswerView: View {
 
     private func checkLinkValidity() async {
         do {
-            let _: EmptyResponse = try await NetworkService.shared.get("/videoQuiz/checkLinkValidity", params: ["id": quizId])
+            let _: EmptyResponse = try await NetworkService.shared.get("/videoQuiz/checkLinkValidity", params: ["id": linkId])
         } catch {
             linkExpired = true
         }
@@ -380,7 +398,7 @@ struct VideoQuizAnswerView: View {
             do {
                 let _: EmptyResponse = try await NetworkService.shared.get("/videoQuiz/claimLuckyBag", params: ["id": activeLinkId])
                 claimedCount += 1
-                luckyBagPoints = luckyBagSetting.points ?? 0
+                luckyBagPoints = Int(luckyBagSetting.points ?? "") ?? 0
                 luckyBagPopupShow = true
             } catch {
                 toastItem = ToastItem(message: error.localizedDescription)
@@ -423,7 +441,7 @@ struct VideoQuizAnswerView: View {
                     if option.isUserSelected {
                         result.optionLabel = option.optionLabel
                     }
-                    if option.isCorrect == true && option.isUserSelected {
+                    if option.isCorrect == 1 && option.isUserSelected {
                         result.isCorrect = true
                     }
                 }
@@ -432,7 +450,7 @@ struct VideoQuizAnswerView: View {
                 }
             } else {
                 let selected = question.options.filter { $0.isUserSelected }.map { $0.optionLabel }
-                let correct = question.options.filter { $0.isCorrect == true }.map { $0.optionLabel }
+                let correct = question.options.filter { $0.isCorrect == 1 }.map { $0.optionLabel }
                 result.optionLabel = selected.joined(separator: ",")
                 result.isCorrect = selected.count == correct.count && selected.allSatisfy { correct.contains($0) }
             }
@@ -463,7 +481,14 @@ struct VideoQuizAnswerView: View {
                 answerPopupShow = false
                 showSuccess = true
             } catch {
-                toastItem = ToastItem(message: error.localizedDescription)
+                let msg = error.localizedDescription
+                toastItem = ToastItem(message: msg)
+                if msg.contains("已经提交") {
+                    answerPopupShow = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        dismiss()
+                    }
+                }
             }
             isSubmitting = false
         }
@@ -485,6 +510,45 @@ struct VideoQuizAnswerView: View {
         // Restart video
         player?.seek(to: .zero)
         player?.play()
+    }
+}
+
+// MARK: - Linear Video Player (禁用快进/变速)
+
+struct LinearVideoPlayer: UIViewControllerRepresentable {
+    let player: AVPlayer
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(player: player)
+    }
+
+    func makeUIViewController(context: Context) -> AVPlayerViewController {
+        let controller = AVPlayerViewController()
+        controller.player = player
+        controller.requiresLinearPlayback = true
+        controller.showsPlaybackControls = true
+        return controller
+    }
+
+    func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {
+        uiViewController.player = player
+    }
+
+    final class Coordinator {
+        private var rateObservation: NSKeyValueObservation?
+
+        init(player: AVPlayer) {
+            rateObservation = player.observe(\.rate, options: [.new]) { player, change in
+                guard let rate = change.newValue else { return }
+                if rate > 0 && rate != 1.0 {
+                    player.rate = 1.0
+                }
+            }
+        }
+
+        deinit {
+            rateObservation?.invalidate()
+        }
     }
 }
 

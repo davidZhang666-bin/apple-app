@@ -142,7 +142,7 @@ struct LoginView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.white)
-                .clipShape(UnevenRoundedRectangle(topLeadingRadius: 25, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 25))
+                .clipShape(TopRoundedRectangle(radius: 25))
                 .shadow(color: .black.opacity(0.05), radius: 10, y: -5)
             }
         }
@@ -242,5 +242,35 @@ extension Color {
             (a, r, g, b) = (255, 0, 0, 0)
         }
         self.init(.sRGB, red: Double(r) / 255, green: Double(g) / 255, blue: Double(b) / 255, opacity: Double(a) / 255)
+    }
+}
+
+// MARK: - Top Rounded Rectangle (iOS 15 compatible)
+
+struct TopRoundedRectangle: Shape {
+    let radius: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: 0, y: rect.height))
+        path.addLine(to: CGPoint(x: 0, y: radius))
+        path.addArc(
+            center: CGPoint(x: radius, y: radius),
+            radius: radius,
+            startAngle: .degrees(180),
+            endAngle: .degrees(270),
+            clockwise: false
+        )
+        path.addLine(to: CGPoint(x: rect.width - radius, y: 0))
+        path.addArc(
+            center: CGPoint(x: rect.width - radius, y: radius),
+            radius: radius,
+            startAngle: .degrees(270),
+            endAngle: .degrees(0),
+            clockwise: false
+        )
+        path.addLine(to: CGPoint(x: rect.width, y: rect.height))
+        path.closeSubpath()
+        return path
     }
 }

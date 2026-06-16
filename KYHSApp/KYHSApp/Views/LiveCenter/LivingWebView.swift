@@ -15,7 +15,13 @@ struct WebView: UIViewRepresentable {
     let url: URL
 
     func makeUIView(context: Context) -> WKWebView {
-        let webView = WKWebView()
+        let config = WKWebViewConfiguration()
+        // 允许 H5 video 内联播放，避免系统 AVPlayer 强制全屏劫持页面
+        config.allowsInlineMediaPlayback = true
+        // 解除自动播放限制（轮播/直播预览常用）
+        config.mediaTypesRequiringUserActionForPlayback = []
+
+        let webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = context.coordinator
         return webView
     }
