@@ -2,6 +2,11 @@ import SwiftUI
 import AVKit
 import Combine
 
+struct LiveWebRoute: Identifiable {
+    let id = UUID()
+    let url: URL
+}
+
 struct LiveCenterView: View {
     @State private var liveItems: [LiveItem] = []
     @State private var livingStreamURL: String?
@@ -9,8 +14,7 @@ struct LiveCenterView: View {
     @State private var isLoading = false
     @State private var isRefreshing = false
     @State private var toastItem: ToastItem?
-    @State private var showLivingWebview = false
-    @State private var livingWebviewURL: String?
+    @State private var livingWebRoute: LiveWebRoute?
 
     private var livingInfo: LiveItem? { liveItems.first(where: { $0.live_status.status == 1 }) }
     private var trailerList: [LiveItem] { liveItems.filter { $0.live_status.status == 4 } }
@@ -37,7 +41,7 @@ struct LiveCenterView: View {
                             .font(.system(size: 18, weight: .semibold))
                         Spacer()
                     }
-                    .padding(.top, 50)
+                    .padding(.top, 12)
                     .padding(.horizontal, 16)
                     .padding(.bottom, 12)
 
@@ -66,18 +70,21 @@ struct LiveCenterView: View {
                 }
             }
             .navigationBarHidden(true)
-            .background(
-                NavigationLink(
-                    isActive: $showLivingWebview,
-                    destination: {
-                        if let urlStr = livingWebviewURL, let url = URL(string: urlStr) {
-                            LivingWebView(url: url)
-                                .navigationTitle("直播")
+            .fullScreenCover(item: $livingWebRoute) { route in
+                NavigationView {
+                    LivingWebView(url: route.url)
+                        .navigationTitle("直播")
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button("返回") {
+                                    livingWebRoute = nil
+                                }
+                            }
                         }
-                    },
-                    label: { EmptyView() }
-                )
-            )
+                }
+                .navigationViewStyle(.stack)
+            }
         }
         .navigationViewStyle(.stack)
         .onAppear {
@@ -198,8 +205,12 @@ struct LiveCenterView: View {
 
                 let (data, _) = try await URLSession.shared.data(from: url)
                 // After auth, navigate to webview with third_user_id
-                livingWebviewURL = "https://live.youinsh.com/livestream/watch/?liveid=\(item.id)&enterprise_id=15579&env=app&extra_info=xxx&third_user_id=\(userId)"
-                showLivingWebview = true
+                let watchURL = "https://live.youinsh.com/livestream/watch/?liveid=\(item.id)&enterprise_id=15579&env=app&extra_info=xxx&third_user_id=\(userId)"
+                guard let url = URL(string: watchURL) else {
+                    toastItem = ToastItem(message: "直播地址无效")
+                    return
+                }
+                livingWebRoute = LiveWebRoute(url: url)
             } catch {
                 toastItem = ToastItem(message: "观看直播失败")
             }
@@ -361,14 +372,10 @@ struct TrailerSection: View {
                             Text(first.title)
                                 .font(.system(size: 14, weight: .semibold))
                                 .lineLimit(1)
-                            HStack(spacing: 10) {
-                                Text("直播人：\(first.nickname ?? "")")
-                                    .font(.system(size: 12))
-                                Text("预约人数：10人")
-                                    .font(.system(size: 12))
-                            }
-                            .foregroundColor(.secondary)
-                            Text("直播时间：\(first.start_time ?? "")")
+                            Text("直播人：\(first.nickname ?? "")")
+                                .font(.system(size: 12))
+                                .foregroundColor(.secondary)
+                            Text("直播时间：\(formattedLiveTime(first.start_time))")
                                 .font(.system(size: 12))
                                 .foregroundColor(.secondary)
                         }
@@ -403,5 +410,9 @@ struct TrailerSection: View {
         .padding(15)
         .background(Color.white)
         .cornerRadius(5)
+    }
+
+    private func formattedLiveTime(_ time: String?) -> String {
+        time?.replacingOccurrences(of: "T", with: " ") ?? ""
     }
 }

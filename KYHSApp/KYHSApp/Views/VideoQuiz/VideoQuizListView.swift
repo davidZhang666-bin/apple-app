@@ -18,8 +18,9 @@ struct VideoQuizListView: View {
                     Text("视频答题列表")
                         .font(.system(size: 15, weight: .bold))
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 60)
+                        .padding(.top, 16)
                         .padding(.horizontal, 16)
+                        .padding(.bottom, 12)
 
                     ScrollView {
                         if quizList.isEmpty && !isLoading {
