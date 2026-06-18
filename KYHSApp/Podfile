@@ -1,0 +1,7 @@
+platform :ios, '15.6'
+
+target 'KYHSApp' do
+  use_frameworks!
+
+  pod 'WechatOpenSDK-XCFramework'
+end

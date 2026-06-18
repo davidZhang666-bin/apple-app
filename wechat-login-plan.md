@@ -10,12 +10,12 @@
 
 | 步骤 | 状态 | 说明 |
 |------|------|------|
-| 1. 初始化 CocoaPods 并添加微信 SDK | ❌ 未开始 | |
-| 2. 新建 AppDelegate（WeChat SDK 生命周期） | ❌ 未开始 | |
-| 3. 在 KYHSAppApp.swift 中接入 AppDelegate | ❌ 未开始 | |
-| 4. 配置 Info.plist | ❌ 未开始 | |
-| 5. 新建 WeChatLoginManager | ❌ 未开始 | |
-| 6. AuthManager 添加微信登录方法 | ❌ 未开始 | |
+| 1. 初始化 CocoaPods 并添加微信 SDK | ✅ 已完成 | 已添加 Podfile；尚需本机执行 pod install |
+| 2. 新建 AppDelegate（WeChat SDK 生命周期） | ✅ 已完成 | 包含 registerApp、URL Scheme 回调、Universal Link 回调 |
+| 3. 在 KYHSAppApp.swift 中接入 AppDelegate | ✅ 已完成 | 已添加 UIApplicationDelegateAdaptor |
+| 4. 配置 Info.plist | ✅ 已完成 | 已添加 URL Scheme 与 LSApplicationQueriesSchemes |
+| 5. 新建 WeChatLoginManager | ✅ 已完成 | 已实现安装检查、发起授权、state 校验、回调登录 |
+| 6. AuthManager 添加微信登录方法 | ✅ 已完成 | 使用 GET /sysUser/addLogin?code= |
 | 7. LoginView 添加微信登录按钮 | ✅ 已完成 | 见下方详情 |
 
 ### 步骤 7 完成详情（2026-05-19）
@@ -85,7 +85,7 @@ end
 **修改** `KYHSApp/KYHSApp/Services/AuthManager.swift`：
 
 添加 `loginWithWeChat(code:)` 方法：
-- 调用后端接口 `POST /sysUser/appLogin`（代码中已存在的接口），参数 `{ "code": code }`
+- 调用后端接口 `GET /sysUser/addLogin?code=...`
 - 复用现有 `LoginResponse` 模型解析 token 和 userId
 - 成功后调用现有的 `login(token:userId:)` + `fetchUserInfo()`，无需重复认证逻辑
 
@@ -93,10 +93,10 @@ end
 
 **修改** `KYHSApp/KYHSApp/Views/Login/LoginView.swift`：
 
-- ~~添加 `@StateObject private var weChatManager = WeChatLoginManager.shared`~~（等 SDK 接入后添加）
+- ✅ 添加 `@StateObject private var weChatManager = WeChatLoginManager.shared`
 - ✅ 在协议勾选下方添加分隔线 + 微信登录按钮（微信绿 `#07C160`）
-- ✅ `handleWeChatLogin()` 方法：先检查协议同意，暂显示开发中提示
-- 🔲 监听 `weChatManager.weChatError` 显示错误提示（等 WeChatLoginManager 创建后添加）
+- ✅ `handleWeChatLogin()` 方法：先检查协议同意，再发起微信授权
+- ✅ 监听 `weChatManager.errorMessage` 显示错误提示
 
 ---
 
@@ -104,14 +104,14 @@ end
 
 | 文件 | 操作 | 说明 | 状态 |
 |------|------|------|------|
-| `KYHSApp/Podfile` | 新建 | CocoaPods 配置 | ❌ |
-| `KYHSApp/KYHSApp/Services/AppDelegate.swift` | 新建 | AppDelegate + WXApiDelegate | ❌ |
-| `KYHSApp/KYHSApp/Services/WeChatLoginManager.swift` | 新建 | 微信登录流程管理 | ❌ |
-| `KYHSApp/KYHSApp/KYHSAppApp.swift` | 修改 | 添加 AppDelegateAdaptor | ❌ |
-| `KYHSApp/KYHSApp/Info.plist` | 修改 | URL Scheme + Query Schemes | ❌ |
+| `KYHSApp/Podfile` | 新建 | CocoaPods 配置 | ✅ |
+| `KYHSApp/KYHSApp/Services/AppDelegate.swift` | 新建 | AppDelegate + WXApiDelegate | ✅ |
+| `KYHSApp/KYHSApp/Services/WeChatLoginManager.swift` | 新建 | 微信登录流程管理 | ✅ |
+| `KYHSApp/KYHSApp/KYHSAppApp.swift` | 修改 | 添加 AppDelegateAdaptor | ✅ |
+| `KYHSApp/KYHSApp/Info.plist` | 修改 | URL Scheme + Query Schemes | ✅ |
 | `KYHSApp/KYHSApp/Views/Login/LoginView.swift` | 修改 | 微信登录按钮 | ✅ |
-| `KYHSApp/KYHSApp/Services/AuthManager.swift` | 修改 | 添加 loginWithWeChat 方法 | ❌ |
-| `.gitignore` | 修改 | 添加 Pods/ | ❌ |
+| `KYHSApp/KYHSApp/Services/AuthManager.swift` | 修改 | 添加 loginWithWeChat 方法 | ✅ |
+| `.gitignore` | 修改 | 添加 Pods/ | ✅ |
 
 ---
 
@@ -121,7 +121,7 @@ end
 |------|------|
 | Bundle ID | `cn.kangyuanhuashan.app` |
 | Universal Link | `https://api.kangyuanhuashan.cn/app/` |
-| 后端微信登录接口 | `POST /sysUser/appLogin`（代码中已存在） |
+| 后端微信登录接口 | `GET /sysUser/addLogin?code=...` |
 | 微信 AppID | 待微信开放平台审核通过后获取 |
 
 ## 需要后端配合的事项

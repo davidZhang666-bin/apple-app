@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		25E0E1CEE47206D2A2A14092 /* Pods_KYHSApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23FB1B24D90FF2D141CF0520 /* Pods_KYHSApp.framework */; };
 		A10001 /* KYHSAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20001 /* KYHSAppApp.swift */; };
 		A10002 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20002 /* Models.swift */; };
 		A10003 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20003 /* NetworkService.swift */; };
@@ -31,9 +32,13 @@
 		A10022 /* ToastModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20022 /* ToastModifier.swift */; };
 		A10023 /* CryptoUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20023 /* CryptoUtils.swift */; };
 		A10024 /* RefreshableCompat.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20024 /* RefreshableCompat.swift */; };
+		A10025 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20025 /* AppDelegate.swift */; };
+		A10026 /* WeChatLoginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20026 /* WeChatLoginManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		23FB1B24D90FF2D141CF0520 /* Pods_KYHSApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KYHSApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8AA900B4A06B941894622A75 /* Pods-KYHSApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KYHSApp.debug.xcconfig"; path = "Target Support Files/Pods-KYHSApp/Pods-KYHSApp.debug.xcconfig"; sourceTree = "<group>"; };
 		A20001 /* KYHSAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KYHSAppApp.swift; sourceTree = "<group>"; };
 		A20002 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		A20003 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
@@ -58,7 +63,10 @@
 		A20022 /* ToastModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastModifier.swift; sourceTree = "<group>"; };
 		A20023 /* CryptoUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoUtils.swift; sourceTree = "<group>"; };
 		A20024 /* RefreshableCompat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshableCompat.swift; sourceTree = "<group>"; };
+		A20025 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A20026 /* WeChatLoginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeChatLoginManager.swift; sourceTree = "<group>"; };
 		A30001 /* KYHSApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KYHSApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D50F13C1C345BC3FF94921C9 /* Pods-KYHSApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KYHSApp.release.xcconfig"; path = "Target Support Files/Pods-KYHSApp/Pods-KYHSApp.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,17 +74,38 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				25E0E1CEE47206D2A2A14092 /* Pods_KYHSApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3E1E6702715FCD0E72F6CE3A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				23FB1B24D90FF2D141CF0520 /* Pods_KYHSApp.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A3885CD46A65E5C1FE0CB3BA /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				8AA900B4A06B941894622A75 /* Pods-KYHSApp.debug.xcconfig */,
+				D50F13C1C345BC3FF94921C9 /* Pods-KYHSApp.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		A50001 = {
 			isa = PBXGroup;
 			children = (
 				A50002 /* KYHSApp */,
 				A50003 /* Products */,
+				A3885CD46A65E5C1FE0CB3BA /* Pods */,
+				3E1E6702715FCD0E72F6CE3A /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -114,6 +143,8 @@
 				A20003 /* NetworkService.swift */,
 				A20004 /* KeychainManager.swift */,
 				A20005 /* AuthManager.swift */,
+				A20025 /* AppDelegate.swift */,
+				A20026 /* WeChatLoginManager.swift */,
 				A20006 /* PushNotificationManager.swift */,
 				A20023 /* CryptoUtils.swift */,
 			);
@@ -190,6 +221,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A70003 /* Build configuration list for PBXNativeTarget "KYHSApp" */;
 			buildPhases = (
+				B6DB216A7FEA5CC7309F3CF3 /* [CP] Check Pods Manifest.lock */,
 				A40002 /* Sources */,
 				A40001 /* Frameworks */,
 				A40003 /* Resources */,
@@ -247,6 +279,31 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		B6DB216A7FEA5CC7309F3CF3 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-KYHSApp-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		A40002 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -257,6 +314,8 @@
 				A10003 /* NetworkService.swift in Sources */,
 				A10004 /* KeychainManager.swift in Sources */,
 				A10005 /* AuthManager.swift in Sources */,
+				A10025 /* AppDelegate.swift in Sources */,
+				A10026 /* WeChatLoginManager.swift in Sources */,
 				A10006 /* PushNotificationManager.swift in Sources */,
 				A10007 /* LoginView.swift in Sources */,
 				A10008 /* ServiceAgreementView.swift in Sources */,
@@ -339,9 +398,11 @@
 		};
 		A90003 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8AA900B4A06B941894622A75 /* Pods-KYHSApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = KYHSApp/KYHSApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = M2PUAW2P5N;
@@ -367,14 +428,17 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
+				WECHAT_APP_ID = wxbe511533c3974cf1;
 			};
 			name = Debug;
 		};
 		A90004 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D50F13C1C345BC3FF94921C9 /* Pods-KYHSApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = KYHSApp/KYHSApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = M2PUAW2P5N;
@@ -400,6 +464,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
+				WECHAT_APP_ID = wxbe511533c3974cf1;
 			};
 			name = Release;
 		};

@@ -13,6 +13,7 @@ struct LoginView: View {
     @State private var showPrivacyPolicy = false
     @State private var showProtocolAlert = false
     @State private var pendingLoginAction: (() -> Void)?
+    @StateObject private var weChatManager = WeChatLoginManager.shared
 
     var body: some View {
         ZStack {
@@ -125,18 +126,27 @@ struct LoginView: View {
 
                     Button(action: handleWeChatLogin) {
                         HStack(spacing: 8) {
-                            Image(systemName: "message.fill")
-                                .font(.system(size: 18))
-                                .foregroundColor(Color(hex: "07C160"))
-                            Text("微信登录")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(Color(hex: "666666"))
+                            if weChatManager.isLoggingIn {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: Color(hex: "07C160")))
+                            } else {
+                                Image("wechat-icon")
+                                    .resizable()
+                                    .renderingMode(.template)
+                                    .foregroundColor(Color(hex: "07C160"))
+                                    .frame(width: 18, height: 18)
+                                Text("微信登录")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(Color(hex: "666666"))
+                            }
                         }
+                        .frame(minWidth: 104)
                         .padding(.horizontal, 22)
                         .padding(.vertical, 10)
                         .background(Color(hex: "F7F8FA"))
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
+                    .disabled(isLoading || weChatManager.isLoggingIn)
 
                     Spacer().frame(height: 32)
                 }
@@ -166,6 +176,11 @@ struct LoginView: View {
         }
         .sheet(isPresented: $showPrivacyPolicy) {
             PrivacyPolicyView()
+        }
+        .onReceive(weChatManager.$errorMessage.compactMap { $0 }) { message in
+            errorMessage = message
+            showError = true
+            weChatManager.errorMessage = nil
         }
     }
 
@@ -219,9 +234,7 @@ struct LoginView: View {
     }
 
     private func doWeChatLogin() {
-        // TODO: 接入微信 SDK 后替换为实际调用
-        errorMessage = "微信登录功能开发中"
-        showError = true
+        weChatManager.requestLogin()
     }
 }
 

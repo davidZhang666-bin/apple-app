@@ -47,6 +47,21 @@ final class AuthManager: ObservableObject {
         }
     }
 
+    func loginWithWeChat(code: String) async throws {
+        let response: LoginResponse = try await NetworkService.shared.get(
+            "/sysUser/addLogin",
+            params: ["code": code],
+            ignoreToken: true
+        )
+
+        guard let token = response.token, let userId = response.userId else {
+            throw NetworkError.serverError("微信登录失败，请稍后重试")
+        }
+
+        login(token: token, userId: userId)
+        await fetchUserInfo()
+    }
+
     private func loadCachedUserInfo() {
         if let data = UserDefaults.standard.data(forKey: "cachedUserInfo"),
            let info = try? JSONDecoder().decode(UserInfo.self, from: data) {

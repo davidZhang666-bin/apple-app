@@ -78,7 +78,7 @@ final class NetworkService {
             throw NetworkError.decodingError
         }
 
-        if code == 401 && path != "/sysUser/appLogin" {
+        if code == 401 && !path.hasPrefix("/sysUser/appLogin") && !path.hasPrefix("/sysUser/addLogin") {
             await MainActor.run { AuthManager.shared.logout() }
             throw NetworkError.unauthorized
         }
@@ -134,17 +134,17 @@ final class NetworkService {
         }
     }
 
-    func get<T: Codable>(_ path: String, params: [String: String]? = nil) async throws -> T {
+    func get<T: Codable>(_ path: String, params: [String: String]? = nil, ignoreToken: Bool = false) async throws -> T {
         var fullPath = path
         if let params, !params.isEmpty {
             let query = params.map { "\($0.key)=\($0.value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? $0.value)" }.joined(separator: "&")
             fullPath += "?" + query
         }
-        return try await request(fullPath)
+        return try await request(fullPath, ignoreToken: ignoreToken)
     }
 
-    func post<T: Codable>(_ path: String, body: Encodable? = nil, contentType: String = "application/x-www-form-urlencoded") async throws -> T {
-        return try await request(path, method: "POST", body: body, contentType: contentType)
+    func post<T: Codable>(_ path: String, body: Encodable? = nil, contentType: String = "application/x-www-form-urlencoded", ignoreToken: Bool = false) async throws -> T {
+        return try await request(path, method: "POST", body: body, contentType: contentType, ignoreToken: ignoreToken)
     }
 
     func spliceVideoURL(_ relativePath: String) -> String {
