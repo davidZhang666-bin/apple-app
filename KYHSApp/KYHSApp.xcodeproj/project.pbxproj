@@ -95,7 +95,6 @@
 				8AA900B4A06B941894622A75 /* Pods-KYHSApp.debug.xcconfig */,
 				D50F13C1C345BC3FF94921C9 /* Pods-KYHSApp.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -405,7 +404,7 @@
 				CODE_SIGN_ENTITLEMENTS = KYHSApp/KYHSApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = M2PUAW2P5N;
+				DEVELOPMENT_TEAM = JH92DQD887;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = KYHSApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "康源华善";
@@ -441,7 +440,7 @@
 				CODE_SIGN_ENTITLEMENTS = KYHSApp/KYHSApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = M2PUAW2P5N;
+				DEVELOPMENT_TEAM = JH92DQD887;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = KYHSApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "康源华善";
