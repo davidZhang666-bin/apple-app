@@ -78,7 +78,7 @@ final class NetworkService {
             throw NetworkError.decodingError
         }
 
-        if code == 401 && !path.hasPrefix("/sysUser/appLogin") && !path.hasPrefix("/sysUser/addLogin") {
+        if code == 401 && !path.hasPrefix("/sysUser/appLogin") {
             await MainActor.run { AuthManager.shared.logout() }
             throw NetworkError.unauthorized
         }

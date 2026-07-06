@@ -49,7 +49,7 @@ final class AuthManager: ObservableObject {
 
     func loginWithWeChat(code: String) async throws {
         let response: LoginResponse = try await NetworkService.shared.get(
-            "/sysUser/addLogin",
+            "/sysUser/appLogin",
             params: ["code": code],
             ignoreToken: true
         )

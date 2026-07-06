@@ -25,6 +25,11 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         open url: URL,
         options: [UIApplication.OpenURLOptionsKey: Any] = [:]
     ) -> Bool {
+        return handleOpenURL(url)
+    }
+
+    @discardableResult
+    func handleOpenURL(_ url: URL) -> Bool {
         #if canImport(WechatOpenSDK) || canImport(WXApi)
         return WXApi.handleOpen(url, delegate: self)
         #else
@@ -37,6 +42,11 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         continue userActivity: NSUserActivity,
         restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
     ) -> Bool {
+        return handleUniversalLink(userActivity)
+    }
+
+    @discardableResult
+    func handleUniversalLink(_ userActivity: NSUserActivity) -> Bool {
         #if canImport(WechatOpenSDK) || canImport(WXApi)
         return WXApi.handleOpenUniversalLink(userActivity, delegate: self)
         #else

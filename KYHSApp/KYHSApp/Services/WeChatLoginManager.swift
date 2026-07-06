@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 #if canImport(WechatOpenSDK)
 import WechatOpenSDK
@@ -19,8 +20,25 @@ final class WeChatLoginManager: ObservableObject {
     @Published var errorMessage: String?
 
     private var currentState: String?
+    private var didBecomeActiveObserver: NSObjectProtocol?
 
-    private init() {}
+    private init() {
+        didBecomeActiveObserver = NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.handleAppDidBecomeActive()
+            }
+        }
+    }
+
+    deinit {
+        if let didBecomeActiveObserver {
+            NotificationCenter.default.removeObserver(didBecomeActiveObserver)
+        }
+    }
 
     var isWeChatInstalled: Bool {
         #if canImport(WechatOpenSDK) || canImport(WXApi)
@@ -33,6 +51,8 @@ final class WeChatLoginManager: ObservableObject {
     func requestLogin() {
         #if canImport(WechatOpenSDK) || canImport(WXApi)
         guard WXApi.isWXAppInstalled() else {
+            isLoggingIn = false
+            currentState = nil
             errorMessage = "请先安装微信客户端"
             return
         }
@@ -62,6 +82,10 @@ final class WeChatLoginManager: ObservableObject {
     func handleAuthResponse(_ response: SendAuthResp) {
         isLoggingIn = false
 
+        guard let expectedState = currentState else {
+            return
+        }
+
         switch response.errCode {
         case 0:
             guard let code = response.code, !code.isEmpty else {
@@ -70,7 +94,7 @@ final class WeChatLoginManager: ObservableObject {
                 return
             }
 
-            guard response.state == currentState else {
+            guard response.state == expectedState else {
                 errorMessage = "微信授权状态校验失败，请重新登录"
                 currentState = nil
                 return
@@ -96,4 +120,22 @@ final class WeChatLoginManager: ObservableObject {
         }
     }
     #endif
+
+    private func handleAppDidBecomeActive() {
+        guard isLoggingIn, let pendingState = currentState else { return }
+
+        Task { [weak self, pendingState] in
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            await MainActor.run {
+                guard let self,
+                      self.isLoggingIn,
+                      self.currentState == pendingState else {
+                    return
+                }
+                self.isLoggingIn = false
+                self.currentState = nil
+                self.errorMessage = "已取消微信登录"
+            }
+        }
+    }
 }
