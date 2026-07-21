@@ -121,32 +121,34 @@ struct LoginView: View {
                     }
                     .padding(.top, 18)
 
-                    // 微信登录
-                    Spacer().frame(height: 18)
+                    if weChatManager.isWeChatInstalled {
+                        // 微信登录
+                        Spacer().frame(height: 18)
 
-                    Button(action: handleWeChatLogin) {
-                        HStack(spacing: 8) {
-                            if weChatManager.isLoggingIn {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle(tint: Color(hex: "07C160")))
-                            } else {
-                                Image("wechat-icon")
-                                    .resizable()
-                                    .renderingMode(.template)
-                                    .foregroundColor(Color(hex: "07C160"))
-                                    .frame(width: 18, height: 18)
-                                Text("微信登录")
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(Color(hex: "666666"))
+                        Button(action: handleWeChatLogin) {
+                            HStack(spacing: 8) {
+                                if weChatManager.isLoggingIn {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle(tint: Color(hex: "07C160")))
+                                } else {
+                                    Image("wechat-icon")
+                                        .resizable()
+                                        .renderingMode(.template)
+                                        .foregroundColor(Color(hex: "07C160"))
+                                        .frame(width: 18, height: 18)
+                                    Text("微信登录")
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundColor(Color(hex: "666666"))
+                                }
                             }
+                            .frame(minWidth: 104)
+                            .padding(.horizontal, 22)
+                            .padding(.vertical, 10)
+                            .background(Color(hex: "F7F8FA"))
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
-                        .frame(minWidth: 104)
-                        .padding(.horizontal, 22)
-                        .padding(.vertical, 10)
-                        .background(Color(hex: "F7F8FA"))
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .disabled(isLoading || weChatManager.isLoggingIn)
                     }
-                    .disabled(isLoading || weChatManager.isLoggingIn)
 
                     Spacer().frame(height: 32)
                 }
@@ -176,6 +178,9 @@ struct LoginView: View {
         }
         .sheet(isPresented: $showPrivacyPolicy) {
             PrivacyPolicyView()
+        }
+        .onAppear {
+            weChatManager.refreshWeChatInstallationStatus()
         }
         .onReceive(weChatManager.$errorMessage.compactMap { $0 }) { message in
             errorMessage = message

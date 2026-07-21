@@ -18,6 +18,7 @@ final class WeChatLoginManager: ObservableObject {
 
     @Published var isLoggingIn = false
     @Published var errorMessage: String?
+    @Published private(set) var isWeChatInstalled = WeChatLoginManager.checkWeChatInstalled()
 
     private var currentState: String?
     private var didBecomeActiveObserver: NSObjectProtocol?
@@ -40,7 +41,11 @@ final class WeChatLoginManager: ObservableObject {
         }
     }
 
-    var isWeChatInstalled: Bool {
+    func refreshWeChatInstallationStatus() {
+        isWeChatInstalled = Self.checkWeChatInstalled()
+    }
+
+    private static func checkWeChatInstalled() -> Bool {
         #if canImport(WechatOpenSDK) || canImport(WXApi)
         WXApi.isWXAppInstalled()
         #else
@@ -49,8 +54,10 @@ final class WeChatLoginManager: ObservableObject {
     }
 
     func requestLogin() {
+        refreshWeChatInstallationStatus()
+
         #if canImport(WechatOpenSDK) || canImport(WXApi)
-        guard WXApi.isWXAppInstalled() else {
+        guard isWeChatInstalled else {
             isLoggingIn = false
             currentState = nil
             errorMessage = "请先安装微信客户端"
@@ -122,6 +129,8 @@ final class WeChatLoginManager: ObservableObject {
     #endif
 
     private func handleAppDidBecomeActive() {
+        refreshWeChatInstallationStatus()
+
         guard isLoggingIn, let pendingState = currentState else { return }
 
         Task { [weak self, pendingState] in
