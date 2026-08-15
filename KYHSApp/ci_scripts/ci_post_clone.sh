@@ -4,4 +4,7 @@ set -e
 echo "Ruby: $(ruby --version)"
 echo "CocoaPods: $(pod --version)"
 
-pod install --repo-update
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+cd "$script_dir/.."
+echo "Installing CocoaPods dependencies in $(pwd)"
+pod install --deployment --verbose
