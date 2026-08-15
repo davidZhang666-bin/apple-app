@@ -97,41 +97,34 @@ struct LiveCenterView: View {
 
     private func loadData() async {
         isLoading = true
-        let work = Task.detached {
-            do {
-                let params: [String: String] = ["page": "1", "title": "", "type": "有因"]
-                let items: [LiveItem] = try await NetworkService.shared.get("/livesMaterial/livesListwz", params: params)
+        do {
+            let params: [String: String] = ["page": "1", "title": "", "type": "有因"]
+            let items: [LiveItem] = try await NetworkService.shared.get("/livesMaterial/livesListwz", params: params)
 
-                var streamURL: String?
-                if let living = items.first(where: { $0.live_status.status == 1 }) {
-                    let info: LiveStreamInfo? = try? await NetworkService.shared.get("/livesMaterial/getPullUrl", params: ["liveid": "\(living.id)"])
-                    streamURL = info?.pull_hls
-                }
+            var streamURL: String?
+            if let living = items.first(where: { $0.live_status.status == 1 }) {
+                let info: LiveStreamInfo? = try? await NetworkService.shared.get("/livesMaterial/getPullUrl", params: ["liveid": "\(living.id)"])
+                streamURL = info?.pull_hls
+            }
 
-                var reserved: [ReservedLiveItem] = []
-                if items.contains(where: { $0.live_status.status == 4 }) {
-                    if let response: ReservedLiveListResponse = try? await NetworkService.shared.get("/livesMaterial/getReservedLiveList") {
-                        reserved = response.list
-                    }
-                }
-
-                await MainActor.run {
-                    self.liveItems = items
-                    self.livingStreamURL = streamURL
-                    self.reservedList = reserved
-                    self.isLoading = false
-                }
-            } catch {
-                await MainActor.run {
-                    let isCancel = error is CancellationError || (error as? URLError)?.code == .cancelled
-                    if !isCancel {
-                        self.toastItem = ToastItem(message: error.localizedDescription)
-                    }
-                    self.isLoading = false
+            var reserved: [ReservedLiveItem] = []
+            if items.contains(where: { $0.live_status.status == 4 }) {
+                if let response: ReservedLiveListResponse = try? await NetworkService.shared.get("/livesMaterial/getReservedLiveList") {
+                    reserved = response.list
                 }
             }
+
+            liveItems = items
+            livingStreamURL = streamURL
+            reservedList = reserved
+            isLoading = false
+        } catch {
+            let isCancel = error is CancellationError || (error as? URLError)?.code == .cancelled
+            if !isCancel {
+                toastItem = ToastItem(message: error.localizedDescription)
+            }
+            isLoading = false
         }
-        _ = await work.value
     }
 
     private func refreshData() async {
@@ -159,10 +152,6 @@ struct LiveCenterView: View {
     }
 
     private func toggleReservation(liveId: Int) {
-        let isBooked = bookedLiveIds.contains("\(liveId)")
-        let message = isBooked ? "确定取消预约吗？" : "确定预约吗？"
-
-        // Using alert approach since we can't use uni.showModal directly
         Task {
             do {
                 let _: EmptyResponse = try await NetworkService.shared.get("/livesMaterial/reserveLive", params: ["liveId": "\(liveId)"])
@@ -175,45 +164,86 @@ struct LiveCenterView: View {
 
     private func navigateToLivingWebview(_ item: LiveItem) {
         Task { @MainActor in
-            guard let userInfo = AuthManager.shared.userInfo, let userId = userInfo.id else {
+            guard let userInfo = AuthManager.shared.userInfo,
+                  let rawUserID = userInfo.id else {
                 toastItem = ToastItem(message: "请先登录")
                 return
             }
 
-            let secret = "3f1e6591f68710f5c804eff7bb963ad8"
-            let today = Date()
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyyMMdd"
-            let currentDate = formatter.string(from: today)
-            let md5Str = "\(secret)\(currentDate)\(userId)"
-            let authToken = CryptoUtils.md5(md5Str)
+            let userID = rawUserID.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !userID.isEmpty else {
+                toastItem = ToastItem(message: "用户信息无效")
+                return
+            }
 
-            let params: [String: String] = [
-                "user_id": "\(userId)",
-                "auth_token": authToken,
-                "nick_name": userInfo.name ?? "用户",
-                "head_image": userInfo.avatar ?? "https://cdn.youinsh.cn/saas_pro/static/user/user-default.png",
-                "enterprise_id": "15579",
-                "next": "https://live.youinsh.com/livestream/watch/?liveid=\(item.id)&enterprise_id=15579&env=app&extra_info=xxx"
+            let trimmedName = userInfo.name?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let nickName = trimmedName.flatMap { $0.isEmpty ? nil : $0 } ?? "用户"
+
+            let defaultHeadImage = "https://cdn.youinsh.cn/saas_pro/static/user/user-default.png"
+            let trimmedAvatar = userInfo.avatar?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let headImage: String
+            if let trimmedAvatar,
+               let avatarURL = URL(string: trimmedAvatar),
+               avatarURL.scheme?.lowercased() == "https",
+               avatarURL.host != nil {
+                headImage = trimmedAvatar
+            } else {
+                headImage = defaultHeadImage
+            }
+
+            let enterpriseID = "15579"
+            let secret = "3f1e6591f68710f5c804eff7bb963ad8"
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.calendar = Calendar(identifier: .gregorian)
+            formatter.timeZone = TimeZone(identifier: "Asia/Shanghai")
+            formatter.dateFormat = "yyyyMMdd"
+            let currentDate = formatter.string(from: Date())
+            let authToken = CryptoUtils.md5("\(secret)\(currentDate)\(userID)")
+
+            var nextComponents = URLComponents()
+            nextComponents.scheme = "https"
+            nextComponents.host = "live.youinsh.com"
+            nextComponents.path = "/livestream/watch/"
+            nextComponents.queryItems = [
+                URLQueryItem(name: "liveid", value: "\(item.id)"),
+                URLQueryItem(name: "enterprise_id", value: enterpriseID),
+                URLQueryItem(name: "wxauth", value: "1"),
+                URLQueryItem(name: "env", value: "app"),
+                URLQueryItem(name: "user_id", value: userID),
+                URLQueryItem(name: "auth_token", value: authToken),
+                URLQueryItem(name: "nick_name", value: nickName)
             ]
 
-            do {
-                let urlStr = "https://pyapi.youinsh.com/livestreamapi/v1/user/watch_from_app_xcx/"
-                var components = URLComponents(string: urlStr)!
-                components.queryItems = params.map { URLQueryItem(name: $0.key, value: $0.value) }
-                guard let url = components.url else { return }
-
-                let (data, _) = try await URLSession.shared.data(from: url)
-                // After auth, navigate to webview with third_user_id
-                let watchURL = "https://live.youinsh.com/livestream/watch/?liveid=\(item.id)&enterprise_id=15579&env=app&extra_info=xxx&third_user_id=\(userId)"
-                guard let url = URL(string: watchURL) else {
-                    toastItem = ToastItem(message: "直播地址无效")
-                    return
-                }
-                livingWebRoute = LiveWebRoute(url: url)
-            } catch {
-                toastItem = ToastItem(message: "观看直播失败")
+            guard let nextURL = nextComponents.url else {
+                toastItem = ToastItem(message: "观看地址无效")
+                return
             }
+
+            guard var authComponents = URLComponents(
+                string: "https://pyapi.youinsh.com/livestreamapi/v1/user/watch_from_app_xcx/"
+            ) else {
+                toastItem = ToastItem(message: "直播认证地址无效")
+                return
+            }
+            authComponents.queryItems = [
+                URLQueryItem(name: "user_id", value: userID),
+                URLQueryItem(name: "auth_token", value: authToken),
+                URLQueryItem(name: "nick_name", value: nickName),
+                URLQueryItem(name: "head_image", value: headImage),
+                URLQueryItem(name: "enterprise_id", value: enterpriseID),
+                URLQueryItem(name: "next", value: nextURL.absoluteString)
+            ]
+
+            guard let authURL = authComponents.url else {
+                toastItem = ToastItem(message: "直播认证地址无效")
+                return
+            }
+
+            #if DEBUG
+            print("🌐 直播WebView初始URL: \(authURL.absoluteString)")
+            #endif
+            livingWebRoute = LiveWebRoute(url: authURL)
         }
     }
 }
