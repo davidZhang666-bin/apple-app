@@ -39,6 +39,10 @@ final class NetworkService {
 
         var request = URLRequest(url: url)
         request.httpMethod = method
+        // 列表页下拉刷新必须重新从服务端获取数据，避免 URLSession 返回缓存响应。
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        request.setValue("no-cache, no-store, max-age=0", forHTTPHeaderField: "Cache-Control")
+        request.setValue("no-cache", forHTTPHeaderField: "Pragma")
 
         if !ignoreToken, let token = KeychainManager.shared.getToken() {
             print("🔑 Token已读取, 长度: \(token.count)")
@@ -70,7 +74,7 @@ final class NetworkService {
             print("📡 \(httpResp.statusCode) \(url.lastPathComponent)")
         }
         if let raw = String(data: data, encoding: .utf8) {
-            print("📦 Response: \(raw.prefix(500))")
+            print("📦 Response: \(raw)")
         }
 
         guard let rawJSON = try? JSONSerialization.jsonObject(with: data) as? [String: Any],

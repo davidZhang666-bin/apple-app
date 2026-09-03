@@ -1,6 +1,18 @@
 import Foundation
 
 struct CryptoUtils {
+    // 有因直播认证密钥。必须与直播预览模块原有进入直播间逻辑保持一致。
+    private static let liveAuthSecret = "3f1e6591f68710f5c804eff7bb963ad8"
+
+    static func liveAuthToken(userID: String, date: Date = Date()) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.timeZone = TimeZone(identifier: "Asia/Shanghai")
+        formatter.dateFormat = "yyyyMMdd"
+        return md5("\(liveAuthSecret)\(formatter.string(from: date))\(userID)")
+    }
+
     static func md5(_ string: String) -> String {
         let message = Array(string.utf8)
         let length = message.count

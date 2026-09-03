@@ -1,6 +1,4 @@
 import SwiftUI
-import AVKit
-import Combine
 
 struct LiveWebRoute: Identifiable {
     let id = UUID()
@@ -9,62 +7,45 @@ struct LiveWebRoute: Identifiable {
 
 struct LiveCenterView: View {
     @State private var liveItems: [LiveItem] = []
-    @State private var livingStreamURL: String?
-    @State private var reservedList: [ReservedLiveItem] = []
     @State private var isLoading = false
-    @State private var isRefreshing = false
     @State private var toastItem: ToastItem?
     @State private var livingWebRoute: LiveWebRoute?
 
-    private var livingInfo: LiveItem? { liveItems.first(where: { $0.live_status.status == 1 }) }
-    private var trailerList: [LiveItem] { liveItems.filter { $0.live_status.status == 4 } }
-    private var bookedLiveIds: Set<String> {
-        Set(reservedList.compactMap { $0.liveId })
+    private var visibleLives: [LiveItem] {
+        liveItems
+            .filter { [1, 2, 4].contains($0.live_status.status) }
+            .sorted { left, right in
+                let lhs = normalizedStartTime(left.start_time)
+                let rhs = normalizedStartTime(right.start_time)
+                if lhs.isEmpty { return false }
+                if rhs.isEmpty { return true }
+                return lhs < rhs
+            }
     }
 
     var body: some View {
         NavigationView {
             ZStack {
-                // Background
                 Image("home-bg")
                     .resizable()
+                    .scaledToFill()
                     .ignoresSafeArea()
 
                 VStack(spacing: 0) {
-                    // Header（移出 ScrollView，避免下拉菊花贴在状态栏下被遮）
-                    HStack {
-                        Image("logo3")
-                            .resizable()
-                            .frame(width: 30, height: 30)
-                        Text("康源华善")
-                            .foregroundColor(.white)
-                            .font(.system(size: 18, weight: .semibold))
-                        Spacer()
-                    }
-                    .padding(.top, 12)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 12)
+                    // NavigationView 在当前 iOS 版本下不会自动为隐藏导航栏保留顶部安全区。
+                    // 显式留出状态栏/灵动岛高度，避免品牌区贴到屏幕最上方。
+                    Spacer().frame(height: 56)
+                    header
 
                     ScrollView {
-                        VStack(spacing: 12) {
-                            // Living area
-                            if let living = livingInfo {
-                                LivingPreviewCard(liveItem: living, streamURL: livingStreamURL) {
-                                    navigateToLivingWebview(living)
-                                }
-                                .padding(.horizontal, 16)
-                            }
-
-                            // Trailer area
-                            TrailerSection(trailerList: trailerList, bookedLiveIds: bookedLiveIds) { liveId in
-                                toggleReservation(liveId: liveId)
-                            }
-                            .padding(.horizontal, 16)
-
+                        VStack(spacing: 0) {
+                            liveList
                             Spacer().frame(height: 20)
                         }
+                        .frame(minHeight: UIScreen.main.bounds.height + 1, alignment: .top)
                     }
                     .compatRefreshable {
+                        print("🔄 首页下拉刷新回调已触发")
                         await refreshData()
                     }
                 }
@@ -77,9 +58,7 @@ struct LiveCenterView: View {
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
                             ToolbarItem(placement: .navigationBarLeading) {
-                                Button("返回") {
-                                    livingWebRoute = nil
-                                }
+                                Button("返回") { livingWebRoute = nil }
                             }
                         }
                 }
@@ -88,81 +67,107 @@ struct LiveCenterView: View {
         }
         .navigationViewStyle(.stack)
         .onAppear {
+            guard liveItems.isEmpty else { return }
             Task { await loadData() }
         }
         .toast($toastItem)
     }
 
-    // MARK: - Data Loading
+    private var header: some View {
+        HStack(spacing: 8) {
+            Image("logo3")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 30, height: 30)
+            Text("康源华善")
+                .foregroundColor(.white)
+                .font(.system(size: 18, weight: .semibold))
+            Spacer()
+        }
+        .padding(.top, 12)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 12)
+    }
 
-    private func loadData() async {
-        isLoading = true
-        do {
-            let params: [String: String] = ["page": "1", "title": "", "type": "有因"]
-            let items: [LiveItem] = try await NetworkService.shared.get("/livesMaterial/livesListwz", params: params)
-
-            var streamURL: String?
-            if let living = items.first(where: { $0.live_status.status == 1 }) {
-                let info: LiveStreamInfo? = try? await NetworkService.shared.get("/livesMaterial/getPullUrl", params: ["liveid": "\(living.id)"])
-                streamURL = info?.pull_hls
-            }
-
-            var reserved: [ReservedLiveItem] = []
-            if items.contains(where: { $0.live_status.status == 4 }) {
-                if let response: ReservedLiveListResponse = try? await NetworkService.shared.get("/livesMaterial/getReservedLiveList") {
-                    reserved = response.list
+    private var liveList: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 7) {
+                Image(systemName: "bolt.fill")
+                    .foregroundColor(Color(hex: "0A9200"))
+                    .font(.system(size: 15, weight: .semibold))
+                Text("直播列表")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(Color(hex: "222222"))
+                Spacer()
+                if isLoading && !liveItems.isEmpty {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .scaleEffect(0.8)
+                        .tint(Color(hex: "0A9200"))
                 }
             }
 
-            liveItems = items
-            livingStreamURL = streamURL
-            reservedList = reserved
-            isLoading = false
+            if visibleLives.isEmpty {
+                emptyState
+            } else {
+                VStack(spacing: 10) {
+                    ForEach(visibleLives) { item in
+                        LiveListCard(liveItem: item) {
+                            navigateToLive(item)
+                        }
+                    }
+                }
+            }
+        }
+        .padding(15)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .padding(.horizontal, 12)
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "dot.radiowaves.left.and.right")
+                .font(.system(size: 30))
+                .foregroundColor(Color.gray.opacity(0.45))
+            Text(isLoading ? "加载中…" : "暂无直播")
+                .font(.system(size: 14))
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 180)
+    }
+
+    private func loadData() async {
+        await MainActor.run { isLoading = true }
+        do {
+            let params = ["page": "1", "title": "", "type": "有因"]
+            print("🔄 首页直播列表开始请求，时间: \(Date()), 参数: \(params)")
+            // 使用独立任务承载网络请求，避免下拉刷新任务结束时被 iOS 一并取消。
+            let requestTask = Task.detached {
+                try await NetworkService.shared.get("/livesMaterial/livesListwz", params: params) as [LiveItem]
+            }
+            let items = try await requestTask.value
+            print("🔄 首页直播列表返回数据：数量=\(items.count)，IDs=\(items.map { $0.id })，状态=\(items.map { $0.live_status.status })")
+            await MainActor.run {
+                liveItems = items
+                isLoading = false
+            }
         } catch {
             let isCancel = error is CancellationError || (error as? URLError)?.code == .cancelled
-            if !isCancel {
-                toastItem = ToastItem(message: error.localizedDescription)
+            print("❌ 首页直播列表请求失败: \(error)")
+            await MainActor.run {
+                isLoading = false
+                if !isCancel { toastItem = ToastItem(message: error.localizedDescription) }
             }
-            isLoading = false
         }
     }
 
     private func refreshData() async {
-        isRefreshing = true
         await loadData()
-        isRefreshing = false
     }
 
-    private func fetchStreamURL(liveId: Int) async {
-        do {
-            let info: LiveStreamInfo = try await NetworkService.shared.get("/livesMaterial/getPullUrl", params: ["liveid": "\(liveId)"])
-            livingStreamURL = info.pull_hls
-        } catch {
-            toastItem = ToastItem(message: error.localizedDescription)
-        }
-    }
-
-    private func fetchReservations() async {
-        do {
-            let response: ReservedLiveListResponse = try await NetworkService.shared.get("/livesMaterial/getReservedLiveList")
-            reservedList = response.list
-        } catch {
-            toastItem = ToastItem(message: error.localizedDescription)
-        }
-    }
-
-    private func toggleReservation(liveId: Int) {
-        Task {
-            do {
-                let _: EmptyResponse = try await NetworkService.shared.get("/livesMaterial/reserveLive", params: ["liveId": "\(liveId)"])
-                await fetchReservations()
-            } catch {
-                toastItem = ToastItem(message: error.localizedDescription)
-            }
-        }
-    }
-
-    private func navigateToLivingWebview(_ item: LiveItem) {
+    private func navigateToLive(_ item: LiveItem) {
         Task { @MainActor in
             guard let userInfo = AuthManager.shared.userInfo,
                   let rawUserID = userInfo.id else {
@@ -192,14 +197,7 @@ struct LiveCenterView: View {
             }
 
             let enterpriseID = "15579"
-            let secret = "3f1e6591f68710f5c804eff7bb963ad8"
-            let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: "en_US_POSIX")
-            formatter.calendar = Calendar(identifier: .gregorian)
-            formatter.timeZone = TimeZone(identifier: "Asia/Shanghai")
-            formatter.dateFormat = "yyyyMMdd"
-            let currentDate = formatter.string(from: Date())
-            let authToken = CryptoUtils.md5("\(secret)\(currentDate)\(userID)")
+            let authToken = CryptoUtils.liveAuthToken(userID: userID)
 
             var nextComponents = URLComponents()
             nextComponents.scheme = "https"
@@ -246,203 +244,102 @@ struct LiveCenterView: View {
             livingWebRoute = LiveWebRoute(url: authURL)
         }
     }
+
 }
 
-
-// MARK: - Preview Player (无控件)
-
-struct PreviewPlayerView: UIViewRepresentable {
-    let player: AVPlayer?
-
-    func makeUIView(context: Context) -> PlayerContainerView {
-        let view = PlayerContainerView()
-        view.playerLayer.videoGravity = .resizeAspectFill
-        view.playerLayer.player = player
-        return view
-    }
-
-    func updateUIView(_ uiView: PlayerContainerView, context: Context) {
-        if uiView.playerLayer.player !== player {
-            uiView.playerLayer.player = player
-        }
-    }
-}
-
-final class PlayerContainerView: UIView {
-    override static var layerClass: AnyClass { AVPlayerLayer.self }
-    var playerLayer: AVPlayerLayer { layer as! AVPlayerLayer }
-}
-
-// MARK: - Living Preview Card
-
-struct LivingPreviewCard: View {
+struct LiveListCard: View {
     let liveItem: LiveItem
-    let streamURL: String?
-    let onWatch: () -> Void
+    let onTap: () -> Void
 
-    @State private var player: AVPlayer?
-    @State private var isPreviewLoading = false
+    private var status: LiveStatusPresentation {
+        LiveStatusPresentation(status: liveItem.live_status.status)
+    }
 
     var body: some View {
-        ZStack {
-            // Video preview
-            if let urlStr = streamURL, let url = URL(string: urlStr) {
-                PreviewPlayerView(player: player)
-                    .frame(height: 194)
-                    .cornerRadius(5)
-                    .allowsHitTesting(false)
-                    .onAppear {
-                        // 每次回到该视图都重建 player：HLS 直播流被 pause 后
-                        // 旧 AVPlayerItem 会 stalled，需要重新拉 manifest 才能恢复
-                        let p = AVPlayer(url: url)
-                        p.isMuted = true
-                        player = p
-                        isPreviewLoading = true
-                        p.play()
-                    }
-                    .onDisappear {
-                        player?.pause()
-                        player?.replaceCurrentItem(with: nil)
-                        player = nil
-                        isPreviewLoading = false
-                    }
-                    .onReceive(
-                        player?.publisher(for: \.timeControlStatus).eraseToAnyPublisher()
-                            ?? Just(AVPlayer.TimeControlStatus.paused).eraseToAnyPublisher()
-                    ) { status in
-                        if status == .playing {
-                            isPreviewLoading = false
+        Button(action: onTap) {
+            HStack(spacing: 12) {
+                ZStack(alignment: .topLeading) {
+                    AsyncImage(url: URL(string: liveItem.image)) { phase in
+                        switch phase {
+                        case .success(let image): image.resizable().scaledToFill()
+                        default: Rectangle().fill(Color.gray.opacity(0.18))
                         }
                     }
-            } else {
-                AsyncImage(url: URL(string: liveItem.image)) { image in
-                    image.resizable()
-                } placeholder: {
-                    Rectangle().fill(Color.gray.opacity(0.3))
-                }
-                .frame(height: 194)
-                .cornerRadius(5)
-            }
+                    .frame(width: 108, height: 76)
+                    .clipped()
 
-            // Overlay
-            VStack {
-                HStack {
-                    Text("康源华善小课堂开课啦")
+                    Text(status.title)
+                        .font(.system(size: 10, weight: .medium))
                         .foregroundColor(.white)
-                        .font(.system(size: 14, weight: .bold))
-                    Spacer()
-                    if isPreviewLoading {
-                        HStack(spacing: 4) {
-                            ProgressView()
-                                .progressViewStyle(.circular)
-                                .controlSize(.mini)
-                                .tint(.white)
-                            Text("加载中")
-                                .foregroundColor(.white)
-                                .font(.system(size: 11))
-                        }
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.black.opacity(0.45))
-                        .cornerRadius(10)
-                    }
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(status.color.opacity(0.92))
+                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                        .padding(5)
                 }
-                Spacer()
-                Button(action: onWatch) {
-                    HStack {
-                        Image(systemName: "play.circle")
-                            .foregroundColor(.white)
-                            .font(.system(size: 15))
-                        Text("观看直播")
-                            .foregroundColor(.white)
-                            .font(.system(size: 14))
+                .frame(width: 108, height: 76)
+                .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(liveItem.title)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(Color(hex: "222222"))
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(2)
+                        .frame(maxWidth: .infinity, minHeight: 34, maxHeight: 34, alignment: .topLeading)
+
+                    HStack(spacing: 8) {
+                        Text(normalizedStartTime(liveItem.start_time).isEmpty ? "时间待定" : normalizedStartTime(liveItem.start_time))
+                            .font(.system(size: 11))
+                            .foregroundColor(Color(hex: "777777"))
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                            .layoutPriority(0)
+
+                        Text("进入直播")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(Color(hex: "0A9200"))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 5)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                                    .stroke(Color(hex: "0A9200"), lineWidth: 1)
+                            )
+                            .fixedSize(horizontal: true, vertical: false)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 5)
-                            .stroke(Color.white, lineWidth: 1)
-                    )
                 }
             }
-            .padding(15)
+            .padding(8)
+            .background(Color(hex: "F8FAF8"))
+            .overlay(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .stroke(Color(hex: "E5EEE5"), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct LiveStatusPresentation {
+    let title: String
+    let color: Color
+
+    init(status: Int) {
+        switch status {
+        case 1:
+            title = "正在直播"
+            color = Color(hex: "0A9200")
+        case 2:
+            title = "主播不在"
+            color = Color(hex: "E58B19")
+        default:
+            title = "未开始"
+            color = Color(hex: "3A7BD5")
         }
     }
 }
 
-// MARK: - Trailer Section
-
-struct TrailerSection: View {
-    let trailerList: [LiveItem]
-    let bookedLiveIds: Set<String>
-    let onReserve: (Int) -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: "calendar.badge.clock")
-                    .font(.system(size: 10))
-                Text("直播预告")
-                    .font(.system(size: 14, weight: .bold))
-            }
-
-            if let first = trailerList.first {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack(spacing: 15) {
-                        AsyncImage(url: URL(string: first.image)) { image in
-                            image.resizable().aspectRatio(contentMode: .fill)
-                        } placeholder: {
-                            Rectangle().fill(Color.gray.opacity(0.2))
-                        }
-                        .frame(width: 106, height: 71)
-                        .clipped()
-                        .cornerRadius(5)
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(first.title)
-                                .font(.system(size: 14, weight: .semibold))
-                                .lineLimit(1)
-                            Text("直播人：\(first.nickname ?? "")")
-                                .font(.system(size: 12))
-                                .foregroundColor(.secondary)
-                            Text("直播时间：\(formattedLiveTime(first.start_time))")
-                                .font(.system(size: 12))
-                                .foregroundColor(.secondary)
-                        }
-                    }
-
-                    Button(action: { onReserve(first.id) }) {
-                        Text(bookedLiveIds.contains("\(first.id)") ? "取消预约" : "立即预约")
-                            .font(.system(size: 14))
-                            .foregroundColor(bookedLiveIds.contains("\(first.id)") ? Color(hex: "6C6C6C") : .white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 44)
-                            .background(bookedLiveIds.contains("\(first.id)") ? Color(hex: "CCCCCC") : Color(hex: "0A9200"))
-                            .cornerRadius(5)
-                    }
-                }
-            } else {
-                HStack {
-                    Spacer()
-                    VStack(spacing: 8) {
-                        Image(systemName: "tray")
-                            .font(.largeTitle)
-                            .foregroundColor(.gray.opacity(0.5))
-                        Text("暂无可预约直播")
-                            .font(.system(size: 14))
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                }
-                .frame(height: 150)
-            }
-        }
-        .padding(15)
-        .background(Color.white)
-        .cornerRadius(5)
-    }
-
-    private func formattedLiveTime(_ time: String?) -> String {
-        time?.replacingOccurrences(of: "T", with: " ") ?? ""
-    }
+private func normalizedStartTime(_ value: String?) -> String {
+    (value ?? "").replacingOccurrences(of: "T", with: " ")
 }

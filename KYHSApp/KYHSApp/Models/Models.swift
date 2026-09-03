@@ -33,6 +33,29 @@ struct LiveItem: Codable, Identifiable {
 
 struct LiveStatusWrapper: Codable {
     let status: Int
+    let info: String?
+
+    init(status: Int, info: String? = nil) {
+        self.status = status
+        self.info = info
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case status, info
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if let value = try? container.decode(Int.self, forKey: .status) {
+            status = value
+        } else if let value = try? container.decode(String.self, forKey: .status),
+                  let intValue = Int(value.trimmingCharacters(in: .whitespacesAndNewlines)) {
+            status = intValue
+        } else {
+            status = 0
+        }
+        info = try? container.decode(String.self, forKey: .info)
+    }
 }
 
 struct LiveStreamInfo: Codable {

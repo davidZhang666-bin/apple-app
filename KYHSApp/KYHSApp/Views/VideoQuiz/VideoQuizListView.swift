@@ -12,43 +12,22 @@ struct VideoQuizListView: View {
             ZStack {
                 Image("home-bg")
                     .resizable()
+                    .scaledToFill()
                     .ignoresSafeArea()
 
                 VStack(spacing: 0) {
-                    Text("视频答题列表")
-                        .font(.system(size: 15, weight: .bold))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 16)
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 12)
+                    Spacer().frame(height: 56)
+                    header
 
                     ScrollView {
-                        if quizList.isEmpty && !isLoading {
-                            VStack(spacing: 8) {
-                                Image(systemName: "tray")
-                                    .font(.largeTitle)
-                                    .foregroundColor(.gray.opacity(0.5))
-                                Text("暂无数据")
-                                    .foregroundColor(.secondary)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.top, 120)
-                        } else {
-                            LazyVStack(spacing: 8) {
-                                ForEach(quizList) { item in
-                                    Button(action: {
-                                        selectedItem = item
-                                        isAnswerActive = true
-                                    }) {
-                                        QuizCard(item: item)
-                                    }
-                                    .buttonStyle(PlainButtonStyle())
-                                }
-                            }
-                            .padding(.horizontal, 16)
+                        VStack(spacing: 0) {
+                            quizListSection
+                            Spacer().frame(height: 20)
                         }
+                        .frame(minHeight: UIScreen.main.bounds.height + 1, alignment: .top)
                     }
                     .compatRefreshable {
+                        print("🔄 视频答题下拉刷新回调已触发")
                         await loadList()
                     }
                 }
@@ -78,26 +57,89 @@ struct VideoQuizListView: View {
         .toast($toastItem)
     }
 
-    private func loadList() async {
-        isLoading = true
-        let work = Task.detached {
-            do {
-                let items: [VideoQuizShareItem] = try await NetworkService.shared.get("/videoQuiz/getShopOwnerShareLinks")
-                await MainActor.run {
-                    self.quizList = items
-                    self.isLoading = false
+    private var header: some View {
+        HStack(spacing: 8) {
+            Image("logo3")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 30, height: 30)
+            Text("康源华善")
+                .foregroundColor(.white)
+                .font(.system(size: 18, weight: .semibold))
+            Spacer()
+        }
+        .padding(.top, 12)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 12)
+    }
+
+    private var quizListSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 7) {
+                Image(systemName: "bolt.fill")
+                    .foregroundColor(Color(hex: "0A9200"))
+                    .font(.system(size: 15, weight: .semibold))
+                Text("视频答题")
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(Color(hex: "222222"))
+                Spacer()
+                if isLoading && !quizList.isEmpty {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                        .tint(Color(hex: "0A9200"))
                 }
-            } catch {
-                await MainActor.run {
-                    let isCancel = error is CancellationError || (error as? URLError)?.code == .cancelled
-                    if !isCancel {
-                        self.toastItem = ToastItem(message: error.localizedDescription)
-                    }
-                    self.isLoading = false
+            }
+
+            if quizList.isEmpty && !isLoading {
+                VStack(spacing: 10) {
+                    Image(systemName: "tray")
+                        .font(.system(size: 30))
+                        .foregroundColor(.gray.opacity(0.45))
+                    Text("暂无数据")
+                        .font(.system(size: 14))
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 180)
+            } else {
+                LazyVStack(spacing: 10) {
+                    ForEach(quizList) { item in
+                        Button(action: {
+                            selectedItem = item
+                            isAnswerActive = true
+                        }) {
+                            QuizCard(item: item)
+                        }
+                        .buttonStyle(.plain)
+                                    }
                 }
             }
         }
-        _ = await work.value
+        .padding(15)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .padding(.horizontal, 12)
+    }
+
+    private func loadList() async {
+        isLoading = true
+        do {
+            print("🔄 视频答题列表开始请求，时间: \(Date())")
+            // 使用独立任务承载网络请求，避免下拉刷新任务结束时被 iOS 一并取消。
+            let requestTask = Task.detached {
+                try await NetworkService.shared.get("/videoQuiz/getShopOwnerShareLinks") as [VideoQuizShareItem]
+            }
+            let items = try await requestTask.value
+            print("🔄 视频答题列表返回数据：数量=\(items.count)，IDs=\(items.map { $0.id })")
+            quizList = items
+        } catch {
+            let isCancel = error is CancellationError || (error as? URLError)?.code == .cancelled
+            print("❌ 视频答题列表请求失败: \(error)")
+            if !isCancel {
+                toastItem = ToastItem(message: error.localizedDescription)
+            }
+        }
+        isLoading = false
     }
 }
 
@@ -129,7 +171,11 @@ struct QuizCard: View {
             Spacer()
         }
         .padding(8)
-        .background(Color.white)
-        .cornerRadius(5)
+        .background(Color(hex: "F8FAF8"))
+        .overlay(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .stroke(Color(hex: "E5EEE5"), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
     }
 }
