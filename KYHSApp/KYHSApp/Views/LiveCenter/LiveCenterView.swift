@@ -296,6 +296,8 @@ struct LiveListCard: View {
                             .truncationMode(.tail)
                             .layoutPriority(0)
 
+                        Spacer(minLength: 16)
+
                         Text("进入直播")
                             .font(.system(size: 11, weight: .medium))
                             .foregroundColor(Color(hex: "0A9200"))
