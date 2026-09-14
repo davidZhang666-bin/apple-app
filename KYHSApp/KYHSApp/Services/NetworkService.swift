@@ -100,6 +100,12 @@ final class NetworkService {
                     if let empty = EmptyResponse() as? T {
                         return empty
                     }
+                    // Optional result types use nil for an empty `data` field.
+                    do {
+                        return try JSONDecoder().decode(T.self, from: Data("null".utf8))
+                    } catch {
+                        // Non-optional result types cannot decode JSON null.
+                    }
                 }
                 // 只有字典或数组类型才用 JSONSerialization
                 if dataField is [String: Any] || dataField is [Any] {
@@ -123,6 +129,16 @@ final class NetworkService {
                     return empty
                 }
                 throw NetworkError.decodingError
+            }
+            // `/appVersion/latest` intentionally omits `data` when the app is
+            // already up to date. Treat that response as an empty result.
+            if let empty = EmptyResponse() as? T {
+                return empty
+            }
+            do {
+                return try JSONDecoder().decode(T.self, from: Data("null".utf8))
+            } catch {
+                // Non-optional result types cannot decode JSON null.
             }
             print("❌ code=200但无data字段")
             throw NetworkError.decodingError

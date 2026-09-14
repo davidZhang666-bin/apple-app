@@ -1,0 +1,11 @@
+cd /Users/admin/IdeaProjects/apple-app
+
+git gpull
+
+# 修改代码后
+git add .
+git commit -m "修复微信登录流程"
+git gpush
+
+# 需要分发/触发 GitHub 构建时
+git release

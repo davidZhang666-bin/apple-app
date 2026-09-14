@@ -25,30 +25,33 @@ struct LiveCenterView: View {
 
     var body: some View {
         NavigationView {
-            ZStack {
-                Image("home-bg")
-                    .resizable()
-                    .scaledToFill()
-                    .ignoresSafeArea()
+            GeometryReader { geometry in
+                ZStack {
+                    Image("home-bg")
+                        .resizable()
+                        .scaledToFill()
+                        .ignoresSafeArea()
 
-                VStack(spacing: 0) {
-                    // NavigationView 在当前 iOS 版本下不会自动为隐藏导航栏保留顶部安全区。
-                    // 显式留出状态栏/灵动岛高度，避免品牌区贴到屏幕最上方。
-                    Spacer().frame(height: 56)
-                    header
+                    VStack(spacing: 0) {
+                        Spacer().frame(height: geometry.safeAreaInsets.top)
+                        header
 
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            liveList
-                            Spacer().frame(height: 20)
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                liveList
+                                Spacer().frame(height: 20)
+                            }
+                            .frame(minHeight: UIScreen.main.bounds.height + 1, alignment: .top)
                         }
-                        .frame(minHeight: UIScreen.main.bounds.height + 1, alignment: .top)
-                    }
-                    .compatRefreshable {
-                        print("🔄 首页下拉刷新回调已触发")
-                        await refreshData()
+                        .compatRefreshable {
+                            print("🔄 首页下拉刷新回调已触发")
+                            await refreshData()
+                        }
                     }
                 }
+                // 页面内容主动延伸到屏幕顶部，再按当前设备的实际
+                // 安全区高度放置 Header，同时保证背景仍覆盖 Logo 区域。
+                .ignoresSafeArea(edges: .top)
             }
             .navigationBarHidden(true)
             .fullScreenCover(item: $livingWebRoute) { route in

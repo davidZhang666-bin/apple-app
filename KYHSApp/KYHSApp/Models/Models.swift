@@ -19,6 +19,25 @@ struct LoginResponse: Codable {
     let userId: String?
 }
 
+// MARK: - App Version
+
+/// The latest-version endpoint returns an empty `data` value when no update is available.
+/// All fields are optional so the model also accepts the iOS response, which omits
+/// `downloadUrl` (and older server versions that may omit `appStoreUrl`).
+struct AppVersionInfo: Codable {
+    let id: String?
+    let platform: String?
+    let versionName: String?
+    let versionCode: Int?
+    let downloadUrl: String?
+    let updateContent: String?
+    let appStoreUrl: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id, platform, versionName, versionCode, downloadUrl, updateContent, appStoreUrl
+    }
+}
+
 // MARK: - Live Stream
 
 struct LiveItem: Codable, Identifiable {

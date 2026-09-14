@@ -9,28 +9,31 @@ struct VideoQuizListView: View {
 
     var body: some View {
         NavigationView {
-            ZStack {
-                Image("home-bg")
-                    .resizable()
-                    .scaledToFill()
-                    .ignoresSafeArea()
+            GeometryReader { geometry in
+                ZStack {
+                    Image("home-bg")
+                        .resizable()
+                        .scaledToFill()
+                        .ignoresSafeArea()
 
-                VStack(spacing: 0) {
-                    Spacer().frame(height: 56)
-                    header
+                    VStack(spacing: 0) {
+                        Spacer().frame(height: geometry.safeAreaInsets.top)
+                        header
 
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            quizListSection
-                            Spacer().frame(height: 20)
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                quizListSection
+                                Spacer().frame(height: 20)
+                            }
+                            .frame(minHeight: UIScreen.main.bounds.height + 1, alignment: .top)
                         }
-                        .frame(minHeight: UIScreen.main.bounds.height + 1, alignment: .top)
-                    }
-                    .compatRefreshable {
-                        print("🔄 视频答题下拉刷新回调已触发")
-                        await loadList()
+                        .compatRefreshable {
+                            print("🔄 视频答题下拉刷新回调已触发")
+                            await loadList()
+                        }
                     }
                 }
+                .ignoresSafeArea(edges: .top)
             }
             .navigationBarHidden(true)
             .background(
